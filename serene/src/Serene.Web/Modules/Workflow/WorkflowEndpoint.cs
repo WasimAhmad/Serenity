@@ -20,5 +20,13 @@ namespace Serene.Workflow
             var actions = engine.GetPermittedTriggers(request.WorkflowKey, request.CurrentState);
             return new GetPermittedActionsResponse { Actions = actions.ToList() };
         }
+
+        [HttpPost]
+        public GetWorkflowDefinitionResponse GetDefinition(GetWorkflowDefinitionRequest request,
+            [FromServices] IWorkflowDefinitionProvider provider)
+        {
+            var def = provider.GetDefinition(request.WorkflowKey);
+            return new GetWorkflowDefinitionResponse { Definition = def };
+        }
     }
 }
