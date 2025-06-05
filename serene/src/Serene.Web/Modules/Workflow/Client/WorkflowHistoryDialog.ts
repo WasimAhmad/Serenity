@@ -1,8 +1,8 @@
-import { Dialog, Decorators } from "@serenity-is/corelib";
+import { BaseDialog, Decorators } from "@serenity-is/corelib";
 import { WorkflowService, GetWorkflowHistoryRequest } from "./WorkflowService";
 
 @Decorators.registerClass('Serene.Workflow.WorkflowHistoryDialog')
-export class WorkflowHistoryDialog extends Dialog<GetWorkflowHistoryRequest, any> {
+export class WorkflowHistoryDialog extends BaseDialog<GetWorkflowHistoryRequest> {
     private grid: HTMLTableElement;
 
     constructor() {
@@ -10,6 +10,11 @@ export class WorkflowHistoryDialog extends Dialog<GetWorkflowHistoryRequest, any
         this.dialogTitle = 'Workflow History';
         this.grid = document.createElement('table');
         this.element.appendChild(this.grid);
+    }
+
+    public loadAndOpenDialog(request: GetWorkflowHistoryRequest, asPanel?: boolean) {
+        Object.assign(this.options as any, request);
+        this.dialogOpen(asPanel);
     }
 
     protected async onDialogOpen() {
