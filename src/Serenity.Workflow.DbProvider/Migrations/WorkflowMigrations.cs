@@ -1,8 +1,9 @@
 using FluentMigrator;
+using Serenity.Extensions;
 
 namespace Serenity.Workflow.Migrations
 {
-    [Migration(2024051601)]
+    [DefaultDB, MigrationKey(20250605_1405)]
     public class WorkflowMigrations : Migration
     {
         public override void Up()
