@@ -18,6 +18,8 @@ namespace Serenity.Workflow
 
         private StateMachine<string, string> GetMachine(string workflowKey)
         {
+            ArgumentNullException.ThrowIfNull(workflowKey);
+
             return machines.GetOrAdd(workflowKey, key =>
             {
                 var def = definitionProvider.GetDefinition(key) ?? throw new InvalidOperationException($"Workflow {key} not found");
@@ -43,6 +45,10 @@ namespace Serenity.Workflow
 
         public async Task ExecuteAsync(string workflowKey, string currentState, string trigger, IDictionary<string, object?>? input)
         {
+            ArgumentNullException.ThrowIfNull(workflowKey);
+            ArgumentNullException.ThrowIfNull(currentState);
+            ArgumentNullException.ThrowIfNull(trigger);
+
             var machine = GetMachine(workflowKey);
             var action = definitionProvider.GetDefinition(workflowKey)?.Triggers[trigger];
             var handler = action?.HandlerKey != null ? services.GetService(Type.GetType(action.HandlerKey)!) as IWorkflowActionHandler : null;
@@ -53,6 +59,9 @@ namespace Serenity.Workflow
 
         public IEnumerable<string> GetPermittedTriggers(string workflowKey, string state)
         {
+            ArgumentNullException.ThrowIfNull(workflowKey);
+            ArgumentNullException.ThrowIfNull(state);
+
             var machine = GetMachine(workflowKey);
             machine.Activate();
             return machine.PermittedTriggers;
