@@ -40,11 +40,22 @@ namespace Serenity.Workflow
 
         private async Task<bool> CanExecuteGuardAsync(string? guardKey)
         {
-            if (guardKey == null)
+            if (string.IsNullOrEmpty(guardKey))
                 return true;
-            var guard = services.GetService(Type.GetType(guardKey)!) as IWorkflowGuard;
+
+            var guardType = Type.GetType(guardKey!);
+            if (guardType == null)
+                guardType = AppDomain.CurrentDomain.GetAssemblies()
+                    .Select(a => a.GetType(guardKey!))
+                    .FirstOrDefault(t => t != null);
+
+            if (guardType == null)
+                return false;
+
+            var guard = services.GetService(guardType) as IWorkflowGuard;
             if (guard == null)
                 return false;
+
             return await guard.CanExecuteAsync(services, this);
         }
 
