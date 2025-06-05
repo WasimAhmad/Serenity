@@ -13,7 +13,7 @@ export class WorkflowHistoryDialog extends BaseDialog<GetWorkflowHistoryRequest>
         const header = document.createElement('thead');
         header.innerHTML = `<tr><th>Date</th><th>From State</th><th>To State</th><th>Trigger</th></tr>`;
         this.grid.appendChild(header);
-        this.element.appendChild(this.grid);
+        this.element.append(this.grid);
     }
 
     public loadAndOpenDialog(request: GetWorkflowHistoryRequest, asPanel?: boolean) {

@@ -119,8 +119,7 @@ public partial class Startup
         services.AddTransient<Workflow.ApproveDocumentWorkflowHandler>();
         services.AddTransient<Workflow.RejectDocumentWorkflowHandler>();
         services.AddTransient<Workflow.ApprovalPermissionGuard>();
-        services.AddSingleton<IWorkflowDefinitionProvider, SampleWorkflowDefinitionProvider>();
-        services.AddSingleton<IWorkflowDefinitionProvider, DocumentWorkflowDefinitionProvider>();
+        services.AddSingleton<IWorkflowDefinitionProvider, WorkflowDefinitionProvider>();
     }
 
     public static void InitializeLocalTexts(IServiceProvider services)

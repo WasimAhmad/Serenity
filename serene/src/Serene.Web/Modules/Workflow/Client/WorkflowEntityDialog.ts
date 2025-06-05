@@ -85,7 +85,7 @@ export abstract class WorkflowEntityDialog<TItem, TOptions> extends EntityDialog
 
     private showHistory() {
         const entity: any = this.entity as any;
-        (new (Serene.Workflow.WorkflowHistoryDialog as any))
+        (new (WorkflowHistoryDialog as any))
             .loadAndOpenDialog({
                 WorkflowKey: this.getWorkflowKey(),
                 EntityId: entity[this.getIdProperty()]
