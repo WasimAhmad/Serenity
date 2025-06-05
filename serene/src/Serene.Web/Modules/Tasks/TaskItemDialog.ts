@@ -13,5 +13,5 @@ export class TaskItemDialog extends WorkflowEntityDialog<TaskItemRow, any> {
     protected form = new TaskItemForm(this.idPrefix);
 
     protected getWorkflowKey() { return 'TaskWorkflow'; }
-    protected getStateProperty() { return 'State'; }
+    protected getStateProperty(): keyof TaskItemRow { return 'State'; }
 }
