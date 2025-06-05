@@ -1,4 +1,5 @@
 using Serenity.Workflow;
+using Serene.Workflow;
 
 namespace Serene;
 
@@ -26,13 +27,56 @@ public class DocumentWorkflowDefinitionProvider : IWorkflowDefinitionProvider
             },
             Triggers = new()
             {
-                ["Submit"] = new WorkflowTrigger { TriggerKey = "Submit", DisplayName = "Submit", RequiresInput = true },
-                ["StartReview"] = new WorkflowTrigger { TriggerKey = "StartReview", DisplayName = "Start Review" },
-                ["RequestChanges"] = new WorkflowTrigger { TriggerKey = "RequestChanges", DisplayName = "Request Changes", RequiresInput = true },
-                ["Resubmit"] = new WorkflowTrigger { TriggerKey = "Resubmit", DisplayName = "Resubmit", RequiresInput = true },
-                ["StartFinalReview"] = new WorkflowTrigger { TriggerKey = "StartFinalReview", DisplayName = "Start Final Review" },
-                ["Approve"] = new WorkflowTrigger { TriggerKey = "Approve", DisplayName = "Approve" },
-                ["Reject"] = new WorkflowTrigger { TriggerKey = "Reject", DisplayName = "Reject", RequiresInput = true }
+                ["Submit"] = new WorkflowTrigger
+                {
+                    TriggerKey = "Submit",
+                    DisplayName = "Submit",
+                    HandlerKey = typeof(Workflow.SubmitDocumentWorkflowHandler).FullName,
+                    RequiresInput = true,
+                    FormKey = "Workflow.DocumentSubmit"
+                },
+                ["StartReview"] = new WorkflowTrigger
+                {
+                    TriggerKey = "StartReview",
+                    DisplayName = "Start Review",
+                    HandlerKey = typeof(Workflow.StartReviewDocumentWorkflowHandler).FullName
+                },
+                ["RequestChanges"] = new WorkflowTrigger
+                {
+                    TriggerKey = "RequestChanges",
+                    DisplayName = "Request Changes",
+                    HandlerKey = typeof(Workflow.RequestChangesDocumentWorkflowHandler).FullName,
+                    RequiresInput = true,
+                    FormKey = "Workflow.DocumentRequestChanges"
+                },
+                ["Resubmit"] = new WorkflowTrigger
+                {
+                    TriggerKey = "Resubmit",
+                    DisplayName = "Resubmit",
+                    HandlerKey = typeof(Workflow.ResubmitDocumentWorkflowHandler).FullName,
+                    RequiresInput = true,
+                    FormKey = "Workflow.DocumentResubmit"
+                },
+                ["StartFinalReview"] = new WorkflowTrigger
+                {
+                    TriggerKey = "StartFinalReview",
+                    DisplayName = "Start Final Review",
+                    HandlerKey = typeof(Workflow.StartFinalReviewDocumentWorkflowHandler).FullName
+                },
+                ["Approve"] = new WorkflowTrigger
+                {
+                    TriggerKey = "Approve",
+                    DisplayName = "Approve",
+                    HandlerKey = typeof(Workflow.ApproveDocumentWorkflowHandler).FullName
+                },
+                ["Reject"] = new WorkflowTrigger
+                {
+                    TriggerKey = "Reject",
+                    DisplayName = "Reject",
+                    HandlerKey = typeof(Workflow.RejectDocumentWorkflowHandler).FullName,
+                    RequiresInput = true,
+                    FormKey = "Workflow.DocumentReject"
+                }
             },
             Transitions = new()
             {

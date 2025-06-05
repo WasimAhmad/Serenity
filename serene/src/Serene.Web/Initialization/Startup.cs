@@ -112,6 +112,13 @@ public partial class Startup
         services.AddWorkflowDbProvider();
         services.AddTransient<Workflow.StartTaskWorkflowHandler>();
         services.AddTransient<Workflow.FinishTaskWorkflowHandler>();
+        services.AddTransient<Workflow.SubmitDocumentWorkflowHandler>();
+        services.AddTransient<Workflow.StartReviewDocumentWorkflowHandler>();
+        services.AddTransient<Workflow.RequestChangesDocumentWorkflowHandler>();
+        services.AddTransient<Workflow.ResubmitDocumentWorkflowHandler>();
+        services.AddTransient<Workflow.StartFinalReviewDocumentWorkflowHandler>();
+        services.AddTransient<Workflow.ApproveDocumentWorkflowHandler>();
+        services.AddTransient<Workflow.RejectDocumentWorkflowHandler>();
         services.AddTransient<Workflow.ApprovalPermissionGuard>();
         services.AddSingleton<IWorkflowDefinitionProvider, SampleWorkflowDefinitionProvider>();
         services.AddSingleton<IWorkflowDefinitionProvider, DocumentWorkflowDefinitionProvider>();
