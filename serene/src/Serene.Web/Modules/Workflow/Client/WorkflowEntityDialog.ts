@@ -1,4 +1,4 @@
-import { EntityDialog, ToolButton, Decorators } from "@serenity-is/corelib";
+import { EntityDialog, ToolButton, Decorators, PropertyDialog } from "@serenity-is/corelib";
 import { WorkflowService, WorkflowDefinition } from "./WorkflowService";
 import { WorkflowHistoryDialog } from "./WorkflowHistoryDialog";
 
@@ -51,14 +51,31 @@ export abstract class WorkflowEntityDialog<TItem, TOptions> extends EntityDialog
         });
     }
 
-    private executeAction(trigger: string) {
+    private executeAction(triggerKey: string) {
         const entity: any = this.entity as any;
-        WorkflowService.ExecuteAction({
-            WorkflowKey: this.getWorkflowKey(),
-            CurrentState: entity[this.getStateProperty()] ?? '',
-            Trigger: trigger,
-            Input: { EntityId: entity[this.getIdProperty()] }
-        }).then(() => this.loadById(entity[this.getIdProperty()]));
+        const trigger = this.workflow?.Triggers[triggerKey];
+
+        const doExecute = (input?: any) => {
+            WorkflowService.ExecuteAction({
+                WorkflowKey: this.getWorkflowKey(),
+                CurrentState: entity[this.getStateProperty()] ?? '',
+                Trigger: triggerKey,
+                Input: { EntityId: entity[this.getIdProperty()], ...input }
+            }).then(() => this.loadById(entity[this.getIdProperty()]));
+        };
+
+        if (trigger?.RequiresInput && trigger.FormKey) {
+            const dlg = new PropertyDialog<any, any>();
+            (dlg as any).getFormKey = () => trigger.FormKey!;
+            dlg.dialogTitle = trigger.DisplayName || trigger.TriggerKey;
+            dlg.dialogOpen();
+            dlg.onClose((r: string) => {
+                if (r === 'ok')
+                    doExecute((dlg as any).getSaveEntity());
+            });
+        } else {
+            doExecute();
+        }
     }
 
     private showHistory() {
