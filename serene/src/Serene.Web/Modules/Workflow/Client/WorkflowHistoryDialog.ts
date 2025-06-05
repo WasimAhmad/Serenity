@@ -9,6 +9,10 @@ export class WorkflowHistoryDialog extends BaseDialog<GetWorkflowHistoryRequest>
         super();
         this.dialogTitle = 'Workflow History';
         this.grid = document.createElement('table');
+        this.grid.classList.add('table', 'table-striped', 'table-bordered', 'workflow-history-grid');
+        const header = document.createElement('thead');
+        header.innerHTML = `<tr><th>Date</th><th>From State</th><th>To State</th><th>Trigger</th></tr>`;
+        this.grid.appendChild(header);
         this.element.appendChild(this.grid);
     }
 

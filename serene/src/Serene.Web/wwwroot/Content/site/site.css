@@ -11,3 +11,19 @@
 .s-PermissionCheckEditor {
   min-height: 450px;
 }
+
+.workflow-history-grid {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.workflow-history-grid td,
+.workflow-history-grid th {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--bs-border-color, #dee2e6);
+}
+
+.workflow-history-grid thead {
+  background-color: var(--bs-secondary-bg, #f8f9fa);
+  font-weight: 600;
+}
