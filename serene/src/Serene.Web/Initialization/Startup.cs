@@ -11,6 +11,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Serenity.Extensions.DependencyInjection;
 using Serenity.Workflow;
+using Serene.Workflow;
 using Serenity.Localization;
 using System.IO;
 
@@ -111,7 +112,9 @@ public partial class Startup
         services.AddWorkflowDbProvider();
         services.AddTransient<Workflow.StartTaskWorkflowHandler>();
         services.AddTransient<Workflow.FinishTaskWorkflowHandler>();
+        services.AddTransient<Workflow.ApprovalPermissionGuard>();
         services.AddSingleton<IWorkflowDefinitionProvider, SampleWorkflowDefinitionProvider>();
+        services.AddSingleton<IWorkflowDefinitionProvider, DocumentWorkflowDefinitionProvider>();
     }
 
     public static void InitializeLocalTexts(IServiceProvider services)
