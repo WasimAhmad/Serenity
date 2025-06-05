@@ -9,6 +9,7 @@ export abstract class WorkflowEntityDialog<TItem, TOptions> extends EntityDialog
     protected abstract getStateProperty(): keyof TItem;
 
     private workflow?: WorkflowDefinition;
+    private workflowGroup?: HTMLElement;
 
     protected async ensureDefinition() {
         if (this.workflow)
@@ -31,23 +32,18 @@ export abstract class WorkflowEntityDialog<TItem, TOptions> extends EntityDialog
             if (!group)
                 return;
 
+            group = group.parentElement!.appendChild(<div class="tool-group workflow-group" />);
+            this.workflowGroup = group as HTMLElement;
+
             this.toolbar.createButton(group, {
                 title: 'History',
                 cssClass: 'workflow-history-button',
                 icon: 'fa-history text-green',
+                separator: 'right',
                 onClick: () => this.showHistory()
             });
 
-            for (const key of Object.keys(this.workflow.Triggers)) {
-                const trigger = this.workflow.Triggers[key];
-                this.toolbar.createButton(group, {
-                    title: trigger.DisplayName || trigger.TriggerKey,
-                    cssClass: `trigger-${trigger.TriggerKey}`,
-                    icon: 'fa-play text-purple',
-                    onClick: () => this.executeAction(trigger.TriggerKey)
-                });
-            }
-            this.updateInterface();
+            this.updateTriggers();
         });
     }
 
@@ -89,19 +85,35 @@ export abstract class WorkflowEntityDialog<TItem, TOptions> extends EntityDialog
             });
     }
 
-    protected override updateInterface() {
-        super.updateInterface();
-        const entity: any = this.entity as any;
-        if (!this.workflow)
+    private updateTriggers() {
+        if (!this.workflow || !this.workflowGroup)
             return;
+
+        const entity: any = this.entity as any;
         WorkflowService.GetPermittedActions({
             WorkflowKey: this.getWorkflowKey(),
             CurrentState: entity[this.getStateProperty()] ?? ''
         }).then(r => {
-            for (const key of Object.keys(this.workflow!.Triggers)) {
-                const btn = this.toolbar.findButton(`trigger-${key}`);
-                btn.toggleClass('disabled', r.Actions.indexOf(key) < 0 || this.isNewOrDeleted());
+            this.workflowGroup!.querySelectorAll('div.tool-button.trigger-button').forEach(el => el.remove());
+            if (this.isNewOrDeleted())
+                return;
+
+            for (const key of r.Actions ?? []) {
+                const trigger = this.workflow!.Triggers[key];
+                if (!trigger)
+                    continue;
+                this.toolbar.createButton(this.workflowGroup!, {
+                    title: trigger.DisplayName || trigger.TriggerKey,
+                    cssClass: `trigger-${trigger.TriggerKey} trigger-button`,
+                    icon: 'fa-play text-purple',
+                    onClick: () => this.executeAction(trigger.TriggerKey)
+                });
             }
         });
+    }
+
+    protected override updateInterface() {
+        super.updateInterface();
+        this.updateTriggers();
     }
 }
