@@ -61,6 +61,15 @@ namespace texts {
                 export const Username: string;
             }
         }
+
+        namespace Tasks {
+
+            namespace TaskItem {
+                export const State: string;
+                export const TaskId: string;
+                export const Title: string;
+            }
+        }
     }
 
     export declare namespace Forms {
@@ -155,6 +164,9 @@ const Texts: typeof texts = proxyTexts({}, '', {
             User: {},
             UserPermission: {},
             UserRole: {}
+        },
+        Tasks: {
+            TaskItem: {}
         }
     },
     Forms: {

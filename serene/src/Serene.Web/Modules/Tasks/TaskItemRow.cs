@@ -1,3 +1,5 @@
+using Serenity.Workflow;
+
 namespace Serene.Tasks;
 
 [ConnectionKey("Default"), Module("Tasks"), TableName("TaskItems")]

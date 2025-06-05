@@ -1,4 +1,4 @@
-import { SaveRequest, SaveResponse, ServiceOptions, DeleteRequest, DeleteResponse, RetrieveRequest, RetrieveResponse, ListRequest, ListResponse, serviceRequest } from "@serenity-is/corelib";
+﻿import { SaveRequest, SaveResponse, ServiceOptions, DeleteRequest, DeleteResponse, RetrieveRequest, RetrieveResponse, ListRequest, ListResponse, serviceRequest } from "@serenity-is/corelib";
 import { TaskItemRow } from "./TaskItemRow";
 
 export namespace TaskItemService {
@@ -19,13 +19,13 @@ export namespace TaskItemService {
     } as const;
 
     [
-        'Create',
-        'Update',
-        'Delete',
-        'Retrieve',
+        'Create', 
+        'Update', 
+        'Delete', 
+        'Retrieve', 
         'List'
     ].forEach(x => {
-        (<any>TaskItemService)[x] = function (r: any, s: any, o: any) {
+        (<any>TaskItemService)[x] = function (r, s, o) {
             return serviceRequest(baseUrl + '/' + x, r, s, o);
         };
     });

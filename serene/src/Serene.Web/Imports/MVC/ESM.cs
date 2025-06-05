@@ -7,9 +7,9 @@ public static partial class ESM
     public const string RolePage = "~/esm/Modules/Administration/Role/RolePage.js";
     public const string ScriptInit = "~/esm/Modules/Common/ScriptInit.js";
     public const string SignUpPage = "~/esm/Modules/Membership/Account/SignUp/SignUpPage.js";
+    public const string TaskItemPage = "~/esm/Modules/Tasks/TaskItemPage.js";
     public const string TranslationPage = "~/esm/Modules/Administration/Translation/TranslationPage.js";
     public const string UserPage = "~/esm/Modules/Administration/User/UserPage.js";
-    public const string TaskItemPage = "~/esm/Modules/Tasks/TaskItem/TaskItemPage.js";
 
     public static partial class Modules
     {
@@ -30,20 +30,13 @@ public static partial class ESM
                 public const string TranslationPage = "~/esm/Modules/Administration/Translation/TranslationPage.js";
             }
 
-        public static partial class User
-        {
-            public const string UserPage = "~/esm/Modules/Administration/User/UserPage.js";
-        }
-        public static partial class Tasks
-        {
-            public static partial class TaskItem
+            public static partial class User
             {
-                public const string TaskItemPage = "~/esm/Modules/Tasks/TaskItem/TaskItemPage.js";
+                public const string UserPage = "~/esm/Modules/Administration/User/UserPage.js";
             }
         }
-    }
 
-    public static partial class Common
+        public static partial class Common
         {
             public const string ScriptInit = "~/esm/Modules/Common/ScriptInit.js";
         }
@@ -62,6 +55,11 @@ public static partial class ESM
                     public const string SignUpPage = "~/esm/Modules/Membership/Account/SignUp/SignUpPage.js";
                 }
             }
+        }
+
+        public static partial class Tasks
+        {
+            public const string TaskItemPage = "~/esm/Modules/Tasks/TaskItemPage.js";
         }
     }
 }
