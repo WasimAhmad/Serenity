@@ -1,5 +1,4 @@
 using Stateless;
-using System.Collections.Concurrent;
 using System.Threading.Tasks;
 
 namespace Serenity.Workflow
@@ -8,7 +7,6 @@ namespace Serenity.Workflow
     {
         private readonly IWorkflowDefinitionProvider definitionProvider;
         private readonly IServiceProvider services;
-        private readonly ConcurrentDictionary<string, StateMachine<string, string>> machines = new();
 
         public WorkflowEngine(IWorkflowDefinitionProvider definitionProvider, IServiceProvider services)
         {
@@ -16,21 +14,23 @@ namespace Serenity.Workflow
             this.services = services;
         }
 
-        private StateMachine<string, string> GetMachine(string workflowKey)
+        private StateMachine<string, string> CreateMachine(string workflowKey, string currentState)
         {
             ArgumentNullException.ThrowIfNull(workflowKey);
+            ArgumentNullException.ThrowIfNull(currentState);
 
-            return machines.GetOrAdd(workflowKey, key =>
+            var def = definitionProvider.GetDefinition(workflowKey) ??
+                throw new InvalidOperationException($"Workflow {workflowKey} not found");
+
+            var sm = new StateMachine<string, string>(currentState);
+            foreach (var t in def.Transitions)
             {
-                var def = definitionProvider.GetDefinition(key) ?? throw new InvalidOperationException($"Workflow {key} not found");
-                var sm = new StateMachine<string, string>(def.InitialState);
-                foreach (var t in def.Transitions)
-                {
-                    sm.Configure(t.From)
-                        .PermitIf(t.Trigger, t.To, () => CanExecuteGuardAsync(t.GuardKey).GetAwaiter().GetResult());
-                }
-                return sm;
-            });
+                sm.Configure(t.From)
+                    .PermitIf(t.Trigger, t.To,
+                        () => CanExecuteGuardAsync(t.GuardKey).GetAwaiter().GetResult());
+            }
+
+            return sm;
         }
 
         private async Task<bool> CanExecuteGuardAsync(string? guardKey)
@@ -49,7 +49,7 @@ namespace Serenity.Workflow
             ArgumentNullException.ThrowIfNull(currentState);
             ArgumentNullException.ThrowIfNull(trigger);
 
-            var machine = GetMachine(workflowKey);
+            var machine = CreateMachine(workflowKey, currentState);
             var action = definitionProvider.GetDefinition(workflowKey)?.Triggers[trigger];
             var handler = action?.HandlerKey != null ? services.GetService(Type.GetType(action.HandlerKey)!) as IWorkflowActionHandler : null;
             if (handler != null)
@@ -62,7 +62,7 @@ namespace Serenity.Workflow
             ArgumentNullException.ThrowIfNull(workflowKey);
             ArgumentNullException.ThrowIfNull(state);
 
-            var machine = GetMachine(workflowKey);
+            var machine = CreateMachine(workflowKey, state);
             machine.Activate();
             return machine.PermittedTriggers;
         }
