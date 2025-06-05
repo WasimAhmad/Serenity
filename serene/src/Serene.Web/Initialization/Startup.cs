@@ -10,6 +10,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Serenity.Extensions.DependencyInjection;
+using Serenity.Workflow;
 using Serenity.Localization;
 using System.IO;
 
