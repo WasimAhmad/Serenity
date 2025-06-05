@@ -109,6 +109,7 @@ public partial class Startup
         services.AddReporting();
         services.AddSerenityWorkflow();
         services.AddWorkflowDbProvider();
+        services.AddSingleton<IWorkflowDefinitionProvider, SampleWorkflowDefinitionProvider>();
     }
 
     public static void InitializeLocalTexts(IServiceProvider services)
