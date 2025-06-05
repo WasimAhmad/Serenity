@@ -11,7 +11,7 @@ export class WorkflowHistoryDialog extends BaseDialog<GetWorkflowHistoryRequest>
         this.grid = document.createElement('table');
         this.grid.classList.add('table', 'table-striped', 'table-bordered', 'workflow-history-grid');
         const header = document.createElement('thead');
-        header.innerHTML = `<tr><th>Date</th><th>From State</th><th>To State</th><th>Trigger</th></tr>`;
+        header.innerHTML = `<tr><th>Date</th><th>From State</th><th>To State</th><th>Trigger</th><th>Input</th></tr>`;
         this.grid.appendChild(header);
         this.element.append(this.grid);
     }
@@ -28,7 +28,8 @@ export class WorkflowHistoryDialog extends BaseDialog<GetWorkflowHistoryRequest>
         const body = document.createElement('tbody');
         for (const h of r.History ?? []) {
             const tr = document.createElement('tr');
-            tr.innerHTML = `<td>${h.EventDate}</td><td>${h.FromState}</td><td>${h.ToState}</td><td>${h.Trigger}</td>`;
+            const inputText = h.Input ? JSON.stringify(h.Input) : '';
+            tr.innerHTML = `<td>${h.EventDate}</td><td>${h.FromState}</td><td>${h.ToState}</td><td>${h.Trigger}</td><td>${inputText}</td>`;
             body.appendChild(tr);
         }
         this.grid.appendChild(body);
