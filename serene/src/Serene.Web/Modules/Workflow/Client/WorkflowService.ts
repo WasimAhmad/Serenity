@@ -1,18 +1,18 @@
-import { serviceRequest } from "@serenity-is/corelib";
+import { serviceRequest, ServiceRequest, ServiceResponse } from "@serenity-is/corelib";
 
-export interface ExecuteWorkflowActionRequest {
+export interface ExecuteWorkflowActionRequest extends ServiceRequest {
     WorkflowKey: string;
     CurrentState: string;
     Trigger: string;
     Input?: any;
 }
 
-export interface GetPermittedActionsRequest {
+export interface GetPermittedActionsRequest extends ServiceRequest {
     WorkflowKey: string;
     CurrentState: string;
 }
 
-export interface GetPermittedActionsResponse {
+export interface GetPermittedActionsResponse extends ServiceResponse {
     Actions: string[];
 }
 
@@ -24,6 +24,6 @@ export namespace WorkflowService {
     }
 
     export function GetPermittedActions(request: GetPermittedActionsRequest) {
-        return serviceRequest(baseUrl + '/GetPermittedActions', request);
+        return serviceRequest<GetPermittedActionsResponse>(baseUrl + '/GetPermittedActions', request);
     }
 }
