@@ -1,5 +1,6 @@
 import { EntityDialog, ToolButton, Decorators } from "@serenity-is/corelib";
 import { WorkflowService, WorkflowDefinition } from "./WorkflowService";
+import { WorkflowHistoryDialog } from "./WorkflowHistoryDialog";
 
 @Decorators.registerClass('Serene.Workflow.WorkflowEntityDialog')
 export abstract class WorkflowEntityDialog<TItem, TOptions> extends EntityDialog<TItem, TOptions> {
@@ -30,6 +31,13 @@ export abstract class WorkflowEntityDialog<TItem, TOptions> extends EntityDialog
             if (!group)
                 return;
 
+            this.toolbar.createButton(group, {
+                title: 'History',
+                cssClass: 'workflow-history-button',
+                icon: 'fa-history text-green',
+                onClick: () => this.showHistory()
+            });
+
             for (const key of Object.keys(this.workflow.Triggers)) {
                 const trigger = this.workflow.Triggers[key];
                 this.toolbar.createButton(group, {
@@ -51,6 +59,15 @@ export abstract class WorkflowEntityDialog<TItem, TOptions> extends EntityDialog
             Trigger: trigger,
             Input: { EntityId: entity[this.getIdProperty()] }
         }).then(() => this.loadById(entity[this.getIdProperty()]));
+    }
+
+    private showHistory() {
+        const entity: any = this.entity as any;
+        (new (Serene.Workflow.WorkflowHistoryDialog as any))
+            .loadAndOpenDialog({
+                WorkflowKey: this.getWorkflowKey(),
+                EntityId: entity[this.getIdProperty()]
+            });
     }
 
     protected override updateInterface() {
