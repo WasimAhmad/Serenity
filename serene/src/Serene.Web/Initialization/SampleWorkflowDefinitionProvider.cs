@@ -21,8 +21,18 @@ public class SampleWorkflowDefinitionProvider : IWorkflowDefinitionProvider
             },
             Triggers = new()
             {
-                ["Start"] = new WorkflowTrigger { TriggerKey = "Start", DisplayName = "Start" },
-                ["Finish"] = new WorkflowTrigger { TriggerKey = "Finish", DisplayName = "Finish" }
+                ["Start"] = new WorkflowTrigger
+                {
+                    TriggerKey = "Start",
+                    DisplayName = "Start",
+                    HandlerKey = typeof(Workflow.StartTaskWorkflowHandler).FullName
+                },
+                ["Finish"] = new WorkflowTrigger
+                {
+                    TriggerKey = "Finish",
+                    DisplayName = "Finish",
+                    HandlerKey = typeof(Workflow.FinishTaskWorkflowHandler).FullName
+                }
             },
             Transitions = new()
             {

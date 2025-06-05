@@ -109,6 +109,8 @@ public partial class Startup
         services.AddReporting();
         services.AddSerenityWorkflow();
         services.AddWorkflowDbProvider();
+        services.AddTransient<Workflow.StartTaskWorkflowHandler>();
+        services.AddTransient<Workflow.FinishTaskWorkflowHandler>();
         services.AddSingleton<IWorkflowDefinitionProvider, SampleWorkflowDefinitionProvider>();
     }
 
