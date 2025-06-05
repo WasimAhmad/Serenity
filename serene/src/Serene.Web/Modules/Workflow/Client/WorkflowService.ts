@@ -17,7 +17,7 @@ export interface GetPermittedActionsResponse {
 }
 
 export namespace WorkflowService {
-    export const baseUrl = 'Services/Workflow';
+    export const baseUrl = 'Workflow';
 
     export function ExecuteAction(request: ExecuteWorkflowActionRequest) {
         return serviceRequest(baseUrl + '/ExecuteAction', request);

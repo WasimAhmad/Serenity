@@ -6,9 +6,9 @@
     <Title>Serenity Workflow - Db Provider</Title>
   </PropertyGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\common-features\src\extensions\Serenity.Extensions.csproj" />
     <ProjectReference Include="..\Serenity.Workflow.Abstractions\Serenity.Workflow.Abstractions.csproj" />
     <ProjectReference Include="..\Serenity.Workflow.Core\Serenity.Workflow.Core.csproj" />
     <ProjectReference Include="..\Serenity.Net.Services\Serenity.Net.Services.csproj" />
-    <PackageReference Include="FluentMigrator" Version="3.3.2" />
   </ItemGroup>
 </Project>
