@@ -16,21 +16,31 @@ export abstract class WorkflowEntityDialog<TItem, TOptions> extends EntityDialog
         this.workflow = r.Definition!;
     }
 
-    protected override async getToolbarButtons(): Promise<ToolButton[]> {
-        const buttons = super.getToolbarButtons();
-        await this.ensureDefinition();
-        if (this.workflow) {
+    protected override getToolbarButtons(): ToolButton[] {
+        return super.getToolbarButtons();
+    }
+
+    protected override onDialogOpen(): void {
+        super.onDialogOpen();
+        this.ensureDefinition().then(() => {
+            if (!this.workflow || !this.toolbar)
+                return;
+
+            let group = this.toolbar.domNode.querySelector('.tool-group');
+            if (!group)
+                return;
+
             for (const key of Object.keys(this.workflow.Triggers)) {
                 const trigger = this.workflow.Triggers[key];
-                buttons.push({
+                this.toolbar.createButton(group, {
                     title: trigger.DisplayName || trigger.TriggerKey,
                     cssClass: `trigger-${trigger.TriggerKey}`,
                     icon: 'fa-play text-purple',
                     onClick: () => this.executeAction(trigger.TriggerKey)
                 });
             }
-        }
-        return buttons;
+            this.updateInterface();
+        });
     }
 
     private executeAction(trigger: string) {
