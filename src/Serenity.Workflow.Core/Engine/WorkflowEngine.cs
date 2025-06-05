@@ -50,10 +50,25 @@ namespace Serenity.Workflow
             ArgumentNullException.ThrowIfNull(trigger);
 
             var machine = CreateMachine(workflowKey, currentState);
-            var action = definitionProvider.GetDefinition(workflowKey)?.Triggers[trigger];
-            var handler = action?.HandlerKey != null ? services.GetService(Type.GetType(action.HandlerKey)!) as IWorkflowActionHandler : null;
+            WorkflowTrigger? action = null;
+            definitionProvider.GetDefinition(workflowKey)?.Triggers.TryGetValue(trigger, out action);
+
+            IWorkflowActionHandler? handler = null;
+            if (action?.HandlerKey != null)
+            {
+                var handlerType = Type.GetType(action.HandlerKey);
+                if (handlerType == null)
+                    handlerType = AppDomain.CurrentDomain.GetAssemblies()
+                        .Select(a => a.GetType(action.HandlerKey))
+                        .FirstOrDefault(t => t != null);
+
+                if (handlerType != null)
+                    handler = services.GetService(handlerType) as IWorkflowActionHandler;
+            }
+
             if (handler != null)
                 await handler.ExecuteAsync(services, this, input);
+
             machine.Fire(trigger);
         }
 
