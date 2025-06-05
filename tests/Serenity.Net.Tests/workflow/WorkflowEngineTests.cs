@@ -1,5 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using Serenity.Workflow;
+using System;
 using System.Collections.Generic;
 using Xunit;
 
@@ -39,6 +40,18 @@ namespace Serenity.Net.Tests.Workflow
             engine.ExecuteAsync("Test", "Draft", "Submit", null).GetAwaiter().GetResult();
             var permitted = engine.GetPermittedTriggers("Test", "Submitted");
             Assert.DoesNotContain("Submit", permitted);
+        }
+
+        [Fact]
+        public void GetPermittedTriggersThrowsOnNullWorkflowKey()
+        {
+            var services = new ServiceCollection();
+            services.AddSingleton<IWorkflowDefinitionProvider, SimpleProvider>();
+            services.AddSerenityWorkflow();
+            var provider = services.BuildServiceProvider();
+            var engine = provider.GetRequiredService<WorkflowEngine>();
+
+            Assert.Throws<ArgumentNullException>(() => engine.GetPermittedTriggers(null!, "Draft"));
         }
     }
 }
