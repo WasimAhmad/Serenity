@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Serenity.Services;
 using Serenity.Workflow;
+using System.Linq;
 
 namespace Serene.Workflow
 {
@@ -27,6 +28,14 @@ namespace Serene.Workflow
         {
             var def = provider.GetDefinition(request.WorkflowKey);
             return new GetWorkflowDefinitionResponse { Definition = def };
+        }
+
+        [HttpPost]
+        public GetWorkflowHistoryResponse GetHistory(GetWorkflowHistoryRequest request,
+            [FromServices] IWorkflowHistoryStore history)
+        {
+            var list = history.GetHistory(request.WorkflowKey, request.EntityId);
+            return new GetWorkflowHistoryResponse { History = list.ToList() };
         }
     }
 }

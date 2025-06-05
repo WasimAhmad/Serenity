@@ -40,6 +40,23 @@ export interface GetWorkflowDefinitionResponse extends ServiceResponse {
     Definition?: WorkflowDefinition;
 }
 
+export interface GetWorkflowHistoryRequest extends ServiceRequest {
+    WorkflowKey: string;
+    EntityId: any;
+}
+
+export interface GetWorkflowHistoryResponse extends ServiceResponse {
+    History?: {
+        WorkflowKey: string;
+        EntityId: any;
+        FromState: string;
+        ToState: string;
+        Trigger: string;
+        EventDate: string;
+        User?: string;
+    }[];
+}
+
 export namespace WorkflowService {
     export const baseUrl = 'Workflow';
 
@@ -53,5 +70,9 @@ export namespace WorkflowService {
 
     export function GetDefinition(request: GetWorkflowDefinitionRequest) {
         return serviceRequest<GetWorkflowDefinitionResponse>(baseUrl + '/GetDefinition', request);
+    }
+
+    export function GetHistory(request: GetWorkflowHistoryRequest) {
+        return serviceRequest<GetWorkflowHistoryResponse>(baseUrl + '/GetHistory', request);
     }
 }

@@ -1,3 +1,6 @@
+using System;
+using System.Collections.Generic;
+
 using Stateless;
 using System.Threading.Tasks;
 
@@ -7,11 +10,13 @@ namespace Serenity.Workflow
     {
         private readonly IWorkflowDefinitionProvider definitionProvider;
         private readonly IServiceProvider services;
+        private readonly IWorkflowHistoryStore historyStore;
 
         public WorkflowEngine(IWorkflowDefinitionProvider definitionProvider, IServiceProvider services)
         {
             this.definitionProvider = definitionProvider;
             this.services = services;
+            this.historyStore = services.GetService<IWorkflowHistoryStore>() ?? new InMemoryWorkflowHistoryStore();
         }
 
         private StateMachine<string, string> CreateMachine(string workflowKey, string currentState)
@@ -69,7 +74,23 @@ namespace Serenity.Workflow
             if (handler != null)
                 handler.ExecuteAsync(services, this, input);
 
+            var from = currentState;
             machine.Fire(trigger);
+            var to = machine.State;
+            object? entityId = null;
+            if (input != null && input.TryGetValue("EntityId", out var val) && val != null)
+                entityId = val;
+            if (entityId != null)
+            {
+                historyStore.RecordEntry(new WorkflowHistoryEntry
+                {
+                    WorkflowKey = workflowKey,
+                    EntityId = entityId,
+                    FromState = from,
+                    ToState = to,
+                    Trigger = trigger
+                });
+            }
         }
 
         public IEnumerable<string> GetPermittedTriggers(string workflowKey, string state)
