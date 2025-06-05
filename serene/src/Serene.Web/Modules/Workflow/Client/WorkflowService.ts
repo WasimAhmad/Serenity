@@ -52,6 +52,7 @@ export interface GetWorkflowHistoryResponse extends ServiceResponse {
         FromState: string;
         ToState: string;
         Trigger: string;
+        Input?: any;
         EventDate: string;
         User?: string;
     }[];

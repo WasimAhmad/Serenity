@@ -1,5 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using Stateless;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Serenity.Workflow
@@ -91,13 +92,17 @@ namespace Serenity.Workflow
                 entityId = val;
             if (entityId != null)
             {
+                IDictionary<string, object?>? historyInput = input == null ? null :
+                    new Dictionary<string, object?>(input);
+                historyInput?.Remove("EntityId");
                 historyStore.RecordEntry(new WorkflowHistoryEntry
                 {
                     WorkflowKey = workflowKey,
                     EntityId = entityId,
                     FromState = from,
                     ToState = to,
-                    Trigger = trigger
+                    Trigger = trigger,
+                    Input = historyInput
                 });
             }
         }
