@@ -6,6 +6,8 @@
     <Title>Serenity Workflow - Abstractions</Title>
   </PropertyGroup>
   <ItemGroup>
+    <Using Remove="Serenity.*" />
     <PackageReference Include="Stateless" Version="5.1.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.0" />
   </ItemGroup>
 </Project>

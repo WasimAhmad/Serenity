@@ -6,7 +6,9 @@
     <Title>Serenity Workflow - Core Engine</Title>
   </PropertyGroup>
   <ItemGroup>
+    <Using Remove="Serenity.*" />
     <ProjectReference Include="..\Serenity.Workflow.Abstractions\Serenity.Workflow.Abstractions.csproj" />
     <PackageReference Include="Stateless" Version="5.1.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.0" />
   </ItemGroup>
 </Project>
