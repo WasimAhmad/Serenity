@@ -66,10 +66,7 @@ export abstract class WorkflowEntityDialog<TItem, TOptions> extends EntityDialog
 
         if (trigger?.RequiresInput && trigger.FormKey) {
             class TriggerDialog extends PropertyDialog<any, any> {
-                constructor(private triggerFormKey: string) {
-                    super();
-                }
-                protected override getFormKey() { return this.triggerFormKey; }
+                protected override getFormKey() { return trigger.FormKey; }
             }
             const dlg = new TriggerDialog(trigger.FormKey);
             dlg.dialogTitle = trigger.DisplayName || trigger.TriggerKey;
