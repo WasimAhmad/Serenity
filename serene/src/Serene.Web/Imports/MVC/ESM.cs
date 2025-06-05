@@ -2,6 +2,7 @@
 
 public static partial class ESM
 {
+    public const string DocumentPage = "~/esm/Modules/Documents/DocumentPage.js";
     public const string LanguagePage = "~/esm/Modules/Administration/Language/LanguagePage.js";
     public const string LoginPage = "~/esm/Modules/Membership/Account/Login/LoginPage.js";
     public const string RolePage = "~/esm/Modules/Administration/Role/RolePage.js";
@@ -39,6 +40,11 @@ public static partial class ESM
         public static partial class Common
         {
             public const string ScriptInit = "~/esm/Modules/Common/ScriptInit.js";
+        }
+
+        public static partial class Documents
+        {
+            public const string DocumentPage = "~/esm/Modules/Documents/DocumentPage.js";
         }
 
         public static partial class Membership

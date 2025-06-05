@@ -10,9 +10,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Serenity.Extensions.DependencyInjection;
-using Serenity.Workflow;
-using Serene.Workflow;
 using Serenity.Localization;
+using Serenity.Workflow;
 using System.IO;
 
 namespace Serene;
@@ -177,7 +176,7 @@ public partial class Startup
 
         app.UseDynamicScripts();
 
-        app.UseEndpoints(endpoints => {
+        app.UseEndpoints(endpoints =>{
             endpoints.MapControllers();
         });
 
