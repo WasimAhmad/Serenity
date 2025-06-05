@@ -8,9 +8,10 @@ namespace Serene.Workflow
     public class WorkflowEndpoint : ServiceEndpoint
     {
         [HttpPost]
-        public async Task ExecuteAction(ExecuteWorkflowActionRequest request, [FromServices] WorkflowEngine engine)
+        public ServiceResponse ExecuteAction(ExecuteWorkflowActionRequest request, [FromServices] WorkflowEngine engine)
         {
-            await engine.ExecuteAsync(request.WorkflowKey, request.CurrentState, request.Trigger, request.Input);
+            engine.ExecuteAsync(request.WorkflowKey, request.CurrentState, request.Trigger, request.Input);
+            return new ServiceResponse();
         }
 
         [HttpPost]
