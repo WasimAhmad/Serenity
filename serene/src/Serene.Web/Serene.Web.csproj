@@ -40,6 +40,9 @@
   <ItemGroup Condition="'$(UseProjectRefs)' != 'false'">
     <ProjectReference Include="$(SerenitySrc)Serenity.Assets\Serenity.Assets.csproj" />
     <ProjectReference Include="$(SerenitySrc)Serenity.Net.Web\Serenity.Net.Web.csproj" />
+    <ProjectReference Include="$(SerenitySrc)Serenity.Workflow.Abstractions\Serenity.Workflow.Abstractions.csproj" />
+    <ProjectReference Include="$(SerenitySrc)Serenity.Workflow.Core\Serenity.Workflow.Core.csproj" />
+    <ProjectReference Include="$(SerenitySrc)Serenity.Workflow.DbProvider\Serenity.Workflow.DbProvider.csproj" />
     <ProjectReference Include="$(SerenitySrc)..\packages\corelib\Serenity.Corelib.csproj" />
     <ProjectReference Include="$(CommonSrc)extensions\Serenity.Extensions.csproj" />
     <ProjectReference Include="$(CommonSrc)demo.northwind\Serenity.Demo.Northwind.csproj" />

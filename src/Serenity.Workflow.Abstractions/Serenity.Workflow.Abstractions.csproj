@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <AssemblyName>Serenity.Workflow.Abstractions</AssemblyName>
+    <Title>Serenity Workflow - Abstractions</Title>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Stateless" Version="5.1.0" />
+  </ItemGroup>
+</Project>
