@@ -106,6 +106,8 @@ public partial class Startup
         services.AddScriptBundling();
         services.AddUploadStorage();
         services.AddReporting();
+        services.AddSerenityWorkflow();
+        services.AddWorkflowDbProvider();
     }
 
     public static void InitializeLocalTexts(IServiceProvider services)
