@@ -1,5 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using Stateless;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -10,6 +11,8 @@ namespace Serenity.Workflow
         private readonly IWorkflowDefinitionProvider definitionProvider;
         private readonly IServiceProvider services;
         private readonly IWorkflowHistoryStore historyStore;
+        private readonly ConcurrentDictionary<string, Type?> guardTypeCache = new();
+        private readonly ConcurrentDictionary<string, Type?> handlerTypeCache = new();
 
         public WorkflowEngine(IWorkflowDefinitionProvider definitionProvider, IServiceProvider services)
         {
@@ -37,17 +40,22 @@ namespace Serenity.Workflow
             return sm;
         }
 
+        private static Type? ResolveType(string key)
+        {
+            var type = Type.GetType(key);
+            if (type == null)
+                type = AppDomain.CurrentDomain.GetAssemblies()
+                    .Select(a => a.GetType(key))
+                    .FirstOrDefault(t => t != null);
+            return type;
+        }
+
         private async Task<bool> CanExecuteGuardAsync(string? guardKey)
         {
             if (string.IsNullOrEmpty(guardKey))
                 return true;
 
-            var guardType = Type.GetType(guardKey!);
-            if (guardType == null)
-                guardType = AppDomain.CurrentDomain.GetAssemblies()
-                    .Select(a => a.GetType(guardKey!))
-                    .FirstOrDefault(t => t != null);
-
+            var guardType = guardTypeCache.GetOrAdd(guardKey!, ResolveType);
             if (guardType == null)
                 return false;
 
@@ -71,12 +79,7 @@ namespace Serenity.Workflow
             IWorkflowActionHandler? handler = null;
             if (action?.HandlerKey != null)
             {
-                var handlerType = Type.GetType(action.HandlerKey);
-                if (handlerType == null)
-                    handlerType = AppDomain.CurrentDomain.GetAssemblies()
-                        .Select(a => a.GetType(action.HandlerKey))
-                        .FirstOrDefault(t => t != null);
-
+                var handlerType = handlerTypeCache.GetOrAdd(action.HandlerKey, ResolveType);
                 if (handlerType != null)
                     handler = services.GetService(handlerType) as IWorkflowActionHandler;
             }
