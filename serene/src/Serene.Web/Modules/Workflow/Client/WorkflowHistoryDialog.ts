@@ -1,4 +1,4 @@
-import { BaseDialog, Decorators } from "@serenity-is/corelib";
+import { BaseDialog, Decorators, htmlEncode } from "@serenity-is/corelib";
 import { WorkflowService, GetWorkflowHistoryRequest } from "./WorkflowService";
 
 @Decorators.registerClass('Serene.Workflow.WorkflowHistoryDialog')
@@ -28,11 +28,24 @@ export class WorkflowHistoryDialog extends BaseDialog<GetWorkflowHistoryRequest>
         const body = document.createElement('tbody');
         for (const h of r.History ?? []) {
             const tr = document.createElement('tr');
-            const inputText = h.Input ? JSON.stringify(h.Input) : '';
-            tr.innerHTML = `<td>${h.EventDate}</td><td>${h.FromState}</td><td>${h.ToState}</td><td>${h.Trigger}</td><td>${inputText}</td>`;
+            const inputHtml = formatInput(h.Input);
+            tr.innerHTML = `<td>${h.EventDate}</td><td>${h.FromState}</td><td>${h.ToState}</td><td>${h.Trigger}</td><td>${inputHtml}</td>`;
             body.appendChild(tr);
         }
         this.grid.appendChild(body);
     }
+}
+
+function formatInput(input: any): string {
+    if (input == null)
+        return '';
+
+    if (typeof input === 'object') {
+        return Object.entries(input)
+            .map(([k, v]) => `<div><strong>${htmlEncode(k)}</strong>: ${htmlEncode(v)}</div>`)
+            .join('');
+    }
+
+    return htmlEncode(String(input));
 }
 
