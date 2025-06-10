@@ -37,7 +37,7 @@ namespace Serenity.Net.Tests.Workflow
             services.AddSerenityWorkflow();
             var provider = services.BuildServiceProvider();
             var engine = provider.GetRequiredService<WorkflowEngine>();
-            engine.ExecuteAsync("Test", "Draft", "Submit", null).GetAwaiter().GetResult();
+            engine.ExecuteAsync("Test", "Draft", "Submit", null);
             var permitted = engine.GetPermittedTriggers("Test", "Submitted");
             Assert.DoesNotContain("Submit", permitted);
         }
