@@ -1,5 +1,8 @@
+using System;
 using System.IO;
 using System.Net;
+using System.Net.Http;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace Serenity.Services;
@@ -11,17 +14,34 @@ namespace Serenity.Services;
 /// Creates an instance of JsonServiceClient for the passed baseUrl
 /// </remarks>
 /// <param name="baseUrl">The base url</param>
-public class JsonServiceClient(string baseUrl)
+public class JsonServiceClient
 {
     /// <summary>
     /// Cookie container
     /// </summary>
-    protected CookieContainer cookies = new();
+    protected readonly CookieContainer cookies = new();
+
+    private readonly HttpClient httpClient;
+
+    public JsonServiceClient(string baseUrl)
+    {
+        BaseUrl = baseUrl;
+
+        var handler = new HttpClientHandler
+        {
+            CookieContainer = cookies
+        };
+
+        httpClient = new HttpClient(handler)
+        {
+            Timeout = TimeSpan.FromMinutes(10)
+        };
+    }
 
     /// <summary>
     /// Base url for the client
     /// </summary>
-    protected string BaseUrl { get; set; } = baseUrl;
+    protected string BaseUrl { get; set; }
 
     /// <summary>
     /// Post to JSON service
@@ -33,7 +53,13 @@ public class JsonServiceClient(string baseUrl)
     public virtual TResponse Post<TResponse>(string relativeUrl, object request)
         where TResponse : new()
     {
-        return InternalPost<TResponse>(relativeUrl, request);
+        return PostAsync<TResponse>(relativeUrl, request).GetAwaiter().GetResult();
+    }
+
+    public virtual async Task<TResponse> PostAsync<TResponse>(string relativeUrl, object request)
+        where TResponse : new()
+    {
+        return await InternalPostAsync<TResponse>(relativeUrl, request);
     }
 
     /// <summary>
@@ -48,23 +74,20 @@ public class JsonServiceClient(string baseUrl)
     protected TResponse InternalPost<TResponse>(string relativeUrl, object request)
         where TResponse : new()
     {
-#pragma warning disable SYSLIB0014 // Type or member is obsolete
-        HttpWebRequest wr = (HttpWebRequest)WebRequest.Create(UriHelper.Combine(BaseUrl, relativeUrl));
-#pragma warning restore SYSLIB0014 // Type or member is obsolete
-        wr.Method = "POST";
+        return InternalPostAsync<TResponse>(relativeUrl, request).GetAwaiter().GetResult();
+    }
+
+    protected async Task<TResponse> InternalPostAsync<TResponse>(string relativeUrl, object request)
+        where TResponse : new()
+    {
+        var url = UriHelper.Combine(BaseUrl, relativeUrl);
         var r = JSON.Stringify(request, writeNulls: true);
-        wr.ContentType = "application/json";
-        var rb = Encoding.UTF8.GetBytes(r);
+        using var content = new StringContent(r, Encoding.UTF8, "application/json");
 
-        wr.CookieContainer = cookies;
-        wr.ContinueTimeout = 10 * 60 * 1000;
-        using (var requestStream = Task.Run(wr.GetRequestStreamAsync).Result)
-            requestStream.Write(rb, 0, rb.Length);
-
-        using var response = Task.Run(wr.GetResponseAsync).Result;
-        using var rs = response.GetResponseStream();
-        using var sr = new StreamReader(rs);
-        var rt = sr.ReadToEnd();
+        using var response = await httpClient.PostAsync(url, content);
+        using var stream = await response.Content.ReadAsStreamAsync();
+        using var sr = new StreamReader(stream);
+        var rt = await sr.ReadToEndAsync();
         var resp = JSON.ParseTolerant<TResponse>(rt);
 
         if (resp is ServiceResponse serviceResponse &&

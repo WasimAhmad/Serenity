@@ -49,7 +49,7 @@ public class ClamAVUploadScanner(IOptionsMonitor<ClamAVSettings> options,
 
             var clam = new ClamClient(host, port);
 
-            var scanResult = Task.Run(() => clam.SendAndScanFileAsync(stream)).Result;
+            var scanResult = clam.SendAndScanFileAsync(stream).GetAwaiter().GetResult();
 
             switch (scanResult.Result)
             {
