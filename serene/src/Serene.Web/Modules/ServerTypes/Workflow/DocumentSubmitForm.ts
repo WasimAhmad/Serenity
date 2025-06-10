@@ -1,7 +1,8 @@
-﻿import { StringEditor, PrefixedContext, initFormType } from "@serenity-is/corelib";
+﻿import { LookupEditor, TextAreaEditor, PrefixedContext, initFormType } from "@serenity-is/corelib";
 
 export interface DocumentSubmitForm {
-    Comment: StringEditor;
+    Language: LookupEditor;
+    Comment: TextAreaEditor;
 }
 
 export class DocumentSubmitForm extends PrefixedContext {
@@ -14,10 +15,12 @@ export class DocumentSubmitForm extends PrefixedContext {
         if (!DocumentSubmitForm.init)  {
             DocumentSubmitForm.init = true;
 
-            var w0 = StringEditor;
+            var w0 = LookupEditor;
+            var w1 = TextAreaEditor;
 
             initFormType(DocumentSubmitForm, [
-                'Comment', w0
+                'Language', w0,
+                'Comment', w1
             ]);
         }
     }
