@@ -9,6 +9,8 @@ export interface WorkflowHistoryGridMixinOptions<TItem> {
 export class WorkflowHistoryGridMixin<TItem> {
     private detailRow?: HTMLElement;
     private rowIndex: number = -1;
+    private scrollContainer?: HTMLElement;
+    private reposition?: () => void;
 
     constructor(private grid: DataGrid<TItem, any>, private options: WorkflowHistoryGridMixinOptions<TItem>) {
         grid.slickGrid.onClick.subscribe((e: Event, p: any) => {
@@ -34,6 +36,19 @@ export class WorkflowHistoryGridMixin<TItem> {
         const detail = document.createElement('div');
         detail.classList.add('workflow-history-detail');
         detail.innerHTML = '<div>Loading...</div>';
+        detail.style.position = 'absolute';
+        const viewport = this.grid.slickContainer.getNode().querySelector('.slick-viewport') as HTMLElement;
+        if (viewport) {
+            this.scrollContainer = viewport;
+        }
+        const reposition = () => {
+            detail.style.top = (rowEl.offsetTop + rowEl.offsetHeight) + 'px';
+            detail.style.left = '0';
+            detail.style.width = rowEl.clientWidth + 'px';
+        };
+        reposition();
+        this.reposition = reposition;
+        this.scrollContainer?.addEventListener('scroll', reposition);
         rowEl.after(detail);
         this.detailRow = detail;
         this.rowIndex = row;
@@ -57,8 +72,12 @@ export class WorkflowHistoryGridMixin<TItem> {
 
     private removeDetail() {
         if (this.detailRow) {
+            if (this.scrollContainer && this.reposition)
+                this.scrollContainer.removeEventListener('scroll', this.reposition);
             this.detailRow.remove();
             this.detailRow = undefined;
+            this.scrollContainer = undefined;
+            this.reposition = undefined;
             this.rowIndex = -1;
         }
     }
