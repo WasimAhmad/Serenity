@@ -2,6 +2,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Stateless;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Serenity.Workflow
@@ -68,6 +69,13 @@ namespace Serenity.Workflow
 
         public void ExecuteAsync(string workflowKey, string currentState, string trigger, IDictionary<string, object?>? input)
         {
+            ExecuteAsync(workflowKey, currentState, trigger, input, null, default).GetAwaiter().GetResult();
+        }
+
+        public async Task ExecuteAsync(string workflowKey, string currentState, string trigger,
+            IDictionary<string, object?>? input, IProgress<double>? progress,
+            CancellationToken cancellationToken = default)
+        {
             ArgumentNullException.ThrowIfNull(workflowKey);
             ArgumentNullException.ThrowIfNull(currentState);
             ArgumentNullException.ThrowIfNull(trigger);
@@ -85,7 +93,12 @@ namespace Serenity.Workflow
             }
 
             if (handler != null)
-                handler.ExecuteAsync(services, this, input);
+            {
+                if (handler is ILongRunningWorkflowActionHandler longHandler)
+                    await longHandler.ExecuteAsync(services, this, input, progress ?? new Progress<double>(_ => { }), cancellationToken);
+                else
+                    await handler.ExecuteAsync(services, this, input);
+            }
 
             var from = currentState;
             machine.Fire(trigger);
