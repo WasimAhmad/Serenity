@@ -31,4 +31,8 @@
 .workflow-history-detail {
   padding: 0.5rem 0.75rem;
   background-color: var(--bs-light-bg, #f8f9fa);
+  position: absolute;
+  left: 0;
+  right: 0;
+  z-index: 999;
 }
