@@ -27,3 +27,8 @@
   background-color: var(--bs-secondary-bg, #f8f9fa);
   font-weight: 600;
 }
+
+.workflow-history-detail {
+  padding: 0.5rem 0.75rem;
+  background-color: var(--bs-light-bg, #f8f9fa);
+}
