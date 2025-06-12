@@ -27,3 +27,8 @@
   background-color: var(--bs-secondary-bg, #f8f9fa);
   font-weight: 600;
 }
+
+.workflow-history-panel {
+  z-index: 10;
+  background-color: var(--bs-body-bg, #fff);
+}
