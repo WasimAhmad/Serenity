@@ -17,7 +17,11 @@ namespace Serenity.Net.Tests.Workflow
                 {
                     WorkflowKey = "Test",
                     InitialState = "Draft",
-                    States = new(),
+                    States = new()
+                    {
+                        ["Draft"] = new WorkflowState { StateKey = "Draft" },
+                        ["Submitted"] = new WorkflowState { StateKey = "Submitted" }
+                    },
                     Triggers = new()
                     {
                         ["Submit"] = new WorkflowTrigger { TriggerKey = "Submit" }
@@ -53,6 +57,30 @@ namespace Serenity.Net.Tests.Workflow
             var engine = provider.GetRequiredService<WorkflowEngine>();
 
             Assert.Throws<ArgumentNullException>(() => engine.GetPermittedTriggers(null!, "Draft"));
+        }
+
+        [Fact]
+        public async Task ExecuteAsyncThrowsOnUnknownTrigger()
+        {
+            var services = new ServiceCollection();
+            services.AddSingleton<IWorkflowDefinitionProvider, SimpleProvider>();
+            services.AddSerenityWorkflow(o => o.UseInMemoryHistoryStore = true);
+            var provider = services.BuildServiceProvider();
+            var engine = provider.GetRequiredService<WorkflowEngine>();
+
+            await Assert.ThrowsAsync<InvalidOperationException>(() => engine.ExecuteAsync("Test", "Draft", "Unknown", null));
+        }
+
+        [Fact]
+        public async Task ExecuteAsyncThrowsWhenTriggerNotAllowedFromState()
+        {
+            var services = new ServiceCollection();
+            services.AddSingleton<IWorkflowDefinitionProvider, SimpleProvider>();
+            services.AddSerenityWorkflow(o => o.UseInMemoryHistoryStore = true);
+            var provider = services.BuildServiceProvider();
+            var engine = provider.GetRequiredService<WorkflowEngine>();
+
+            await Assert.ThrowsAsync<InvalidOperationException>(() => engine.ExecuteAsync("Test", "Submitted", "Submit", null));
         }
     }
 }
