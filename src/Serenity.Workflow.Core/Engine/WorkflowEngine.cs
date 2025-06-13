@@ -14,6 +14,8 @@ namespace Serenity.Workflow
         private readonly IWorkflowHistoryStore historyStore;
         private readonly ConcurrentDictionary<string, Type?> guardTypeCache = new();
         private readonly ConcurrentDictionary<string, Type?> handlerTypeCache = new();
+        private static readonly ConcurrentDictionary<string, Type> resolvedTypes = new();
+        private static readonly Type MissingTypeSentinel = typeof(void);
 
         public WorkflowEngine(IWorkflowDefinitionProvider definitionProvider,
             IServiceProvider services, IWorkflowHistoryStore historyStore)
@@ -44,11 +46,30 @@ namespace Serenity.Workflow
 
         private static Type? ResolveType(string key)
         {
+            if (resolvedTypes.TryGetValue(key, out var cached))
+            {
+                if (cached == MissingTypeSentinel)
+                    return null;
+
+                return cached;
+            }
+
             var type = Type.GetType(key);
             if (type == null)
-                type = AppDomain.CurrentDomain.GetAssemblies()
-                    .Select(a => a.GetType(key))
-                    .FirstOrDefault(t => t != null);
+            {
+                foreach (var asm in AppDomain.CurrentDomain.GetAssemblies())
+                {
+                    type = asm.GetType(key);
+                    if (type != null)
+                        break;
+                }
+            }
+
+            resolvedTypes[key] = type ?? MissingTypeSentinel;
+
+            if (type == null)
+                throw new InvalidOperationException($"Workflow type '{key}' could not be resolved. Ensure the assembly is referenced and the type name is correct.");
+
             return type;
         }
 
