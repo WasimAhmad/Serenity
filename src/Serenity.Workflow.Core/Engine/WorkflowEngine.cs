@@ -67,7 +67,7 @@ namespace Serenity.Workflow
             return await guard.CanExecuteAsync(services, this);
         }
 
-        public void ExecuteAsync(string workflowKey, string currentState, string trigger, IDictionary<string, object?>? input)
+        public async Task ExecuteAsync(string workflowKey, string currentState, string trigger, IDictionary<string, object?>? input)
         {
             ArgumentNullException.ThrowIfNull(workflowKey);
             ArgumentNullException.ThrowIfNull(currentState);
@@ -86,10 +86,10 @@ namespace Serenity.Workflow
             }
 
             if (handler != null)
-                handler.ExecuteAsync(services, this, input);
+                await handler.ExecuteAsync(services, this, input);
 
             var from = currentState;
-            machine.Fire(trigger);
+            await machine.FireAsync(trigger);
             var to = machine.State;
             object? entityId = null;
             if (input != null && input.TryGetValue("EntityId", out var val) && val != null)
