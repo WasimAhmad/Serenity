@@ -5,5 +5,6 @@ namespace Serene.Documents.Forms;
 public class DocumentForm
 {
     public string Title { get; set; }
+    [DefaultValue("Draft"), ReadOnly(true)]
     public string State { get; set; }
 }

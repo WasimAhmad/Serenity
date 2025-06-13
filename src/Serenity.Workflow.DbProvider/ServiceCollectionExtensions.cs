@@ -8,6 +8,7 @@ namespace Serenity.Workflow
         public static IServiceCollection AddWorkflowDbProvider(this IServiceCollection services)
         {
             services.AddScoped<IWorkflowDefinitionProvider, DatabaseWorkflowDefinitionProvider>();
+            services.AddScoped<IWorkflowHistoryStore, DBWorkflowHistoryStore>();
             return services;
         }
     }

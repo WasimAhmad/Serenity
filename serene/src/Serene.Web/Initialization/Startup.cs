@@ -107,8 +107,8 @@ public partial class Startup
         services.AddScriptBundling();
         services.AddUploadStorage();
         services.AddReporting();
-        services.AddSerenityWorkflow();
         services.AddWorkflowDbProvider();
+        services.AddSerenityWorkflow();
         services.AddTransient<Workflow.StartTaskWorkflowHandler>();
         services.AddTransient<Workflow.FinishTaskWorkflowHandler>();
         services.AddTransient<Workflow.SubmitDocumentWorkflowHandler>();

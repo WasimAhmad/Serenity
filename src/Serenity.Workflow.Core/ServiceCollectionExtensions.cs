@@ -6,8 +6,7 @@ namespace Serenity.Workflow
     {
         public static IServiceCollection AddSerenityWorkflow(this IServiceCollection services)
         {
-            services.AddSingleton<WorkflowEngine>();
-            services.AddSingleton<IWorkflowHistoryStore, InMemoryWorkflowHistoryStore>();
+            services.AddScoped<WorkflowEngine>();
             return services;
         }
     }
