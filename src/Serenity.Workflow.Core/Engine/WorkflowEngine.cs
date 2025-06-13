@@ -3,6 +3,7 @@ using Stateless;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Serenity.Abstractions;
 
 namespace Serenity.Workflow
 {
@@ -98,6 +99,10 @@ namespace Serenity.Workflow
                 IDictionary<string, object?>? historyInput = input == null ? null :
                     new Dictionary<string, object?>(input);
                 historyInput?.Remove("EntityId");
+
+                var userAccessor = services.GetService<IUserAccessor>();
+                var userName = userAccessor?.User?.Identity?.Name;
+
                 historyStore.RecordEntry(new WorkflowHistoryEntry
                 {
                     WorkflowKey = workflowKey,
@@ -105,7 +110,8 @@ namespace Serenity.Workflow
                     FromState = from,
                     ToState = to,
                     Trigger = trigger,
-                    Input = historyInput
+                    Input = historyInput,
+                    User = string.IsNullOrEmpty(userName) ? null : userName
                 });
             }
         }
