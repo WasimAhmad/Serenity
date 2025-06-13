@@ -75,6 +75,8 @@ namespace Serenity.Workflow
             ArgumentNullException.ThrowIfNull(trigger);
 
             var machine = CreateMachine(workflowKey, currentState);
+            if (input != null)
+                input["CurrentState"] = currentState;
             WorkflowTrigger? action = null;
             definitionProvider.GetDefinition(workflowKey)?.Triggers.TryGetValue(trigger, out action);
 
