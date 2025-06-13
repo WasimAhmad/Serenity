@@ -2,6 +2,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Serenity.Workflow;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace Serenity.Net.Tests.Workflow
@@ -30,14 +31,14 @@ namespace Serenity.Net.Tests.Workflow
         }
 
         [Fact]
-        public void CanFireTrigger()
+        public async Task CanFireTrigger()
         {
             var services = new ServiceCollection();
             services.AddSingleton<IWorkflowDefinitionProvider, SimpleProvider>();
-            services.AddSerenityWorkflow();
+            services.AddSerenityWorkflow(o => o.UseInMemoryHistoryStore = true);
             var provider = services.BuildServiceProvider();
             var engine = provider.GetRequiredService<WorkflowEngine>();
-            engine.ExecuteAsync("Test", "Draft", "Submit", null);
+            await engine.ExecuteAsync("Test", "Draft", "Submit", null);
             var permitted = engine.GetPermittedTriggers("Test", "Submitted");
             Assert.DoesNotContain("Submit", permitted);
         }
@@ -47,7 +48,7 @@ namespace Serenity.Net.Tests.Workflow
         {
             var services = new ServiceCollection();
             services.AddSingleton<IWorkflowDefinitionProvider, SimpleProvider>();
-            services.AddSerenityWorkflow();
+            services.AddSerenityWorkflow(o => o.UseInMemoryHistoryStore = true);
             var provider = services.BuildServiceProvider();
             var engine = provider.GetRequiredService<WorkflowEngine>();
 
