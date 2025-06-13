@@ -1,4 +1,5 @@
 using Serenity.Data;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -26,7 +27,7 @@ public class DBWorkflowHistoryStore(ISqlConnections connections, int batchSize =
             ToState = x.ToState!,
             Trigger = x.Trigger!,
             Input = x.Input == null ? null : JSON.Parse<Dictionary<string, object?>>(x.Input),
-            EventDate = x.EventDate ?? DateTime.UtcNow,
+            EventDate = x.EventDate != null ? DateTime.SpecifyKind(x.EventDate.Value, DateTimeKind.Utc) : DateTime.UtcNow,
             User = x.User
         });
     }
