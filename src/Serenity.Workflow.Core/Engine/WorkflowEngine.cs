@@ -109,8 +109,8 @@ namespace Serenity.Workflow
 
             var machine = CreateMachine(workflowKey, currentState);
 
-            if (input != null)
-                input["CurrentState"] = currentState;
+            //if (input != null)
+            //    input["CurrentState"] = currentState;
 
             if (!machine.CanFire(trigger))
                 throw new InvalidOperationException($"Trigger '{trigger}' cannot be fired from state '{currentState}' for workflow '{workflowKey}'");
