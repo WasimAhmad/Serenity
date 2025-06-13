@@ -84,6 +84,10 @@ namespace Serenity.Workflow
                 throw new InvalidOperationException($"State '{currentState}' is not defined for workflow '{workflowKey}'");
 
             var machine = CreateMachine(workflowKey, currentState);
+
+            if (input != null)
+                input["CurrentState"] = currentState;
+
             if (!machine.CanFire(trigger))
                 throw new InvalidOperationException($"Trigger '{trigger}' cannot be fired from state '{currentState}' for workflow '{workflowKey}'");
 

@@ -16,10 +16,15 @@ public class SubmitDocumentWorkflowHandler(ISqlConnections connections) : IWorkf
         var documentId = Convert.ToInt32(id);
         using var connection = connections.NewByKey("Default");
         var fields = Documents.DocumentRow.Fields;
-        new SqlUpdate(fields.TableName)
+        input.TryGetValue("CurrentState", out var cs);
+        var update = new SqlUpdate(fields.TableName)
             .Set(fields.State, "Submitted")
-            .Where(fields.DocumentId == documentId)
-            .Execute(connection);
+            .Where(fields.DocumentId == documentId);
+        if (cs is string state)
+            update.Where(fields.State == state);
+        var rows = update.Execute(connection, ExpectedRows.ZeroOrOne);
+        if (rows == 0)
+            throw new InvalidOperationException("Concurrent modification detected");
 
         return Task.CompletedTask;
     }
