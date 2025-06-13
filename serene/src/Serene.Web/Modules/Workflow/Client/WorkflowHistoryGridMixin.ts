@@ -1,4 +1,4 @@
-import { DataGrid } from "@serenity-is/corelib";
+import { DataGrid, htmlEncode } from "@serenity-is/corelib";
 import { WorkflowService } from "./WorkflowService";
 
 export interface WorkflowHistoryGridMixinOptions<TItem> {
@@ -58,11 +58,11 @@ export class WorkflowHistoryGridMixin<TItem> {
         });
         const table = document.createElement('table');
         table.classList.add('table', 'table-striped', 'table-bordered', 'workflow-history-grid');
-        table.innerHTML = '<thead><tr><th>Date</th><th>From State</th><th>To State</th><th>Trigger</th><th>Input</th></tr></thead>';
+        table.innerHTML = '<thead><tr><th>Date</th><th>User</th><th>From State</th><th>To State</th><th>Trigger</th><th>Input</th></tr></thead>';
         const body = document.createElement('tbody');
         for (const h of resp.History ?? []) {
             const tr = document.createElement('tr');
-            tr.innerHTML = `<td>${h.EventDate}</td><td>${h.FromState}</td><td>${h.ToState}</td><td>${h.Trigger}</td><td>${this.formatInput(h.Input)}</td>`;
+            tr.innerHTML = `<td>${this.formatRelative(h.EventDate)}</td><td>${htmlEncode(h.User ?? '')}</td><td>${h.FromState}</td><td>${h.ToState}</td><td>${h.Trigger}</td><td>${this.formatInput(h.Input)}</td>`;
             body.appendChild(tr);
         }
         table.appendChild(body);
@@ -87,16 +87,27 @@ export class WorkflowHistoryGridMixin<TItem> {
             return '';
         if (typeof input === 'object') {
             return Object.entries(input)
-                .map(([k, v]) => `<div><strong>${this.escape(k)}</strong>: ${this.escape(String(v))}</div>`)
+                .map(([k, v]) => `<div><strong>${htmlEncode(k)}</strong>: ${htmlEncode(v)}</div>`)
                 .join('');
         }
-        return this.escape(String(input));
+        return htmlEncode(String(input));
     }
 
-    private escape(s: string): string {
-        return s.replace(/&/g, '&amp;')
-            .replace(/</g, '&lt;')
-            .replace(/>/g, '&gt;')
-            .replace(/"/g, '&quot;');
+    private formatRelative(dateStr: string): string {
+        const date = new Date(dateStr);
+        const now = new Date();
+        const seconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+        if (seconds < 60)
+            return 'just now';
+        const minutes = Math.floor(seconds / 60);
+        if (minutes < 60)
+            return `${minutes} minute${minutes !== 1 ? 's' : ''} ago`;
+        const hours = Math.floor(minutes / 60);
+        if (hours < 24)
+            return `${hours} hour${hours !== 1 ? 's' : ''} ago`;
+        const days = Math.floor(hours / 24);
+        if (days < 7)
+            return `${days} day${days !== 1 ? 's' : ''} ago`;
+        return date.toLocaleString();
     }
 }
