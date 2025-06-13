@@ -74,11 +74,25 @@ namespace Serenity.Workflow
             ArgumentNullException.ThrowIfNull(currentState);
             ArgumentNullException.ThrowIfNull(trigger);
 
+            var def = definitionProvider.GetDefinition(workflowKey) ??
+                throw new InvalidOperationException($"Workflow {workflowKey} not found");
+
+            if (!def.Triggers.ContainsKey(trigger))
+                throw new InvalidOperationException($"Trigger '{trigger}' is not defined for workflow '{workflowKey}'");
+
+            if (!def.States.ContainsKey(currentState))
+                throw new InvalidOperationException($"State '{currentState}' is not defined for workflow '{workflowKey}'");
+
             var machine = CreateMachine(workflowKey, currentState);
+
             if (input != null)
                 input["CurrentState"] = currentState;
+
+            if (!machine.CanFire(trigger))
+                throw new InvalidOperationException($"Trigger '{trigger}' cannot be fired from state '{currentState}' for workflow '{workflowKey}'");
+
             WorkflowTrigger? action = null;
-            definitionProvider.GetDefinition(workflowKey)?.Triggers.TryGetValue(trigger, out action);
+            def.Triggers.TryGetValue(trigger, out action);
 
             IWorkflowActionHandler? handler = null;
             if (action?.HandlerKey != null)
