@@ -30,6 +30,35 @@ namespace Serenity.Net.Tests.Workflow
             }
         }
 
+        private class TestHandler : IWorkflowEventHandler
+        {
+            public List<string> EnteredStates { get; } = new();
+            public List<string> ExitedStates { get; } = new();
+            public List<string> FiredTriggers { get; } = new();
+
+            public Task OnTriggerFiredAsync(IServiceProvider services, WorkflowEngine engine,
+                string workflowKey, string fromState, string trigger,
+                IDictionary<string, object?>? input)
+            {
+                FiredTriggers.Add(trigger);
+                return Task.CompletedTask;
+            }
+
+            public Task OnExitStateAsync(IServiceProvider services, WorkflowEngine engine,
+                string workflowKey, string state)
+            {
+                ExitedStates.Add(state);
+                return Task.CompletedTask;
+            }
+
+            public Task OnEnterStateAsync(IServiceProvider services, WorkflowEngine engine,
+                string workflowKey, string state)
+            {
+                EnteredStates.Add(state);
+                return Task.CompletedTask;
+            }
+        }
+
         [Fact]
         public async Task CanFireTrigger()
         {
@@ -53,6 +82,25 @@ namespace Serenity.Net.Tests.Workflow
             var engine = provider.GetRequiredService<WorkflowEngine>();
 
             Assert.Throws<ArgumentNullException>(() => engine.GetPermittedTriggers(null!, "Draft"));
+        }
+
+        [Fact]
+        public async Task EventsAreFired()
+        {
+            var handler = new TestHandler();
+            var services = new ServiceCollection();
+            services.AddSingleton<IWorkflowDefinitionProvider, SimpleProvider>();
+            services.AddSerenityWorkflow(o =>
+            {
+                o.UseInMemoryHistoryStore = true;
+                o.EventHandlers.Add(handler);
+            });
+            var provider = services.BuildServiceProvider();
+            var engine = provider.GetRequiredService<WorkflowEngine>();
+            await engine.ExecuteAsync("Test", "Draft", "Submit", null);
+            Assert.Contains("Submit", handler.FiredTriggers);
+            Assert.Contains("Draft", handler.ExitedStates);
+            Assert.Contains("Submitted", handler.EnteredStates);
         }
     }
 }
