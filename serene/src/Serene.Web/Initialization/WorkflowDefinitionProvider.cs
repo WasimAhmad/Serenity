@@ -26,6 +26,12 @@ public class WorkflowDefinitionProvider : IWorkflowDefinitionProvider
                         DisplayName = "Start",
                         HandlerKey = typeof(Workflow.StartTaskWorkflowHandler).FullName
                     },
+                    ["Process"] = new WorkflowTrigger
+                    {
+                        TriggerKey = "Process",
+                        DisplayName = "Long Process",
+                        HandlerKey = typeof(Workflow.LongTaskWorkflowHandler).FullName
+                    },
                     ["Finish"] = new WorkflowTrigger
                     {
                         TriggerKey = "Finish",
@@ -36,6 +42,7 @@ public class WorkflowDefinitionProvider : IWorkflowDefinitionProvider
                 Transitions = new()
             {
                 new WorkflowTransition { From = "Open", Trigger = "Start", To = "InProgress" },
+                new WorkflowTransition { From = "InProgress", Trigger = "Process", To = "InProgress" },
                 new WorkflowTransition { From = "InProgress", Trigger = "Finish", To = "Closed" }
             }},
             new WorkflowDefinition
