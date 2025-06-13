@@ -106,6 +106,7 @@ namespace Serenity.Net.Tests.Workflow
             Assert.Contains("Submit", handler.FiredTriggers);
             Assert.Contains("Draft", handler.ExitedStates);
             Assert.Contains("Submitted", handler.EnteredStates);
+        }
 
         public async Task ExecuteAsyncThrowsOnUnknownTrigger()
         {
