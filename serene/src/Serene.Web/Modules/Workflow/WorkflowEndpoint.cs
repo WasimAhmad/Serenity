@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Serenity.Services;
 using Serenity.Workflow;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Serene.Workflow
 {
@@ -9,9 +10,9 @@ namespace Serene.Workflow
     public class WorkflowEndpoint : ServiceEndpoint
     {
         [HttpPost]
-        public ServiceResponse ExecuteAction(ExecuteWorkflowActionRequest request, [FromServices] WorkflowEngine engine)
+        public async Task<ServiceResponse> ExecuteAction(ExecuteWorkflowActionRequest request, [FromServices] WorkflowEngine engine)
         {
-            engine.ExecuteAsync(request.WorkflowKey, request.CurrentState, request.Trigger, request.Input);
+            await engine.ExecuteAsync(request.WorkflowKey, request.CurrentState, request.Trigger, request.Input);
             return new ServiceResponse();
         }
 
