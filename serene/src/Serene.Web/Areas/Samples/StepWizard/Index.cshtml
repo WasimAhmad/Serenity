@@ -1,0 +1,15 @@
+@{
+    ViewData["Title"] = "Step Wizard";
+}
+
+@section ContentHeader {
+    <h1>Step Wizard</h1>
+}
+
+<div id="PanelDiv" class="s-Panel">
+    <div class="step-pane">This is step 1</div>
+    <div class="step-pane">This is step 2</div>
+    <div class="step-pane">This is step 3</div>
+</div>
+
+@Html.ModulePageInit(ESM.StepWizardPage)
