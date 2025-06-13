@@ -12,15 +12,18 @@ namespace Serenity.Workflow
         private readonly IWorkflowDefinitionProvider definitionProvider;
         private readonly IServiceProvider services;
         private readonly IWorkflowHistoryStore historyStore;
+        private readonly WorkflowEngineOptions options;
         private readonly ConcurrentDictionary<string, Type?> guardTypeCache = new();
         private readonly ConcurrentDictionary<string, Type?> handlerTypeCache = new();
 
         public WorkflowEngine(IWorkflowDefinitionProvider definitionProvider,
-            IServiceProvider services, IWorkflowHistoryStore historyStore)
+            IServiceProvider services, IWorkflowHistoryStore historyStore,
+            WorkflowEngineOptions options)
         {
             this.definitionProvider = definitionProvider;
             this.services = services;
             this.historyStore = historyStore ?? throw new ArgumentNullException(nameof(historyStore));
+            this.options = options;
         }
 
         private StateMachine<string, string> CreateMachine(string workflowKey, string currentState)
@@ -105,9 +108,20 @@ namespace Serenity.Workflow
             if (handler != null)
                 await handler.ExecuteAsync(services, this, input);
 
+            foreach (var h in options.EventHandlers)
+                await h.OnTriggerFiredAsync(services, this, workflowKey, currentState, trigger, input);
+
             var from = currentState;
+
+            foreach (var h in options.EventHandlers)
+                await h.OnExitStateAsync(services, this, workflowKey, from);
+
             await machine.FireAsync(trigger);
+
             var to = machine.State;
+
+            foreach (var h in options.EventHandlers)
+                await h.OnEnterStateAsync(services, this, workflowKey, to);
             object? entityId = null;
             if (input != null && input.TryGetValue("EntityId", out var val) && val != null)
                 entityId = val;
