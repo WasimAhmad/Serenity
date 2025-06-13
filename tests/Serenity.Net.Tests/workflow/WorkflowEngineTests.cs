@@ -17,7 +17,11 @@ namespace Serenity.Net.Tests.Workflow
                 {
                     WorkflowKey = "Test",
                     InitialState = "Draft",
-                    States = new(),
+                    States = new()
+                    {
+                        ["Draft"] = new WorkflowState { StateKey = "Draft" },
+                        ["Submitted"] = new WorkflowState { StateKey = "Submitted" }
+                    },
                     Triggers = new()
                     {
                         ["Submit"] = new WorkflowTrigger { TriggerKey = "Submit" }
@@ -85,6 +89,7 @@ namespace Serenity.Net.Tests.Workflow
         }
 
         [Fact]
+
         public async Task EventsAreFired()
         {
             var handler = new TestHandler();
@@ -101,6 +106,29 @@ namespace Serenity.Net.Tests.Workflow
             Assert.Contains("Submit", handler.FiredTriggers);
             Assert.Contains("Draft", handler.ExitedStates);
             Assert.Contains("Submitted", handler.EnteredStates);
+
+        public async Task ExecuteAsyncThrowsOnUnknownTrigger()
+        {
+            var services = new ServiceCollection();
+            services.AddSingleton<IWorkflowDefinitionProvider, SimpleProvider>();
+            services.AddSerenityWorkflow(o => o.UseInMemoryHistoryStore = true);
+            var provider = services.BuildServiceProvider();
+            var engine = provider.GetRequiredService<WorkflowEngine>();
+
+            await Assert.ThrowsAsync<InvalidOperationException>(() => engine.ExecuteAsync("Test", "Draft", "Unknown", null));
+        }
+
+        [Fact]
+        public async Task ExecuteAsyncThrowsWhenTriggerNotAllowedFromState()
+        {
+            var services = new ServiceCollection();
+            services.AddSingleton<IWorkflowDefinitionProvider, SimpleProvider>();
+            services.AddSerenityWorkflow(o => o.UseInMemoryHistoryStore = true);
+            var provider = services.BuildServiceProvider();
+            var engine = provider.GetRequiredService<WorkflowEngine>();
+
+            await Assert.ThrowsAsync<InvalidOperationException>(() => engine.ExecuteAsync("Test", "Submitted", "Submit", null));
+
         }
     }
 }
