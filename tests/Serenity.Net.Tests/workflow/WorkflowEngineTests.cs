@@ -35,7 +35,7 @@ namespace Serenity.Net.Tests.Workflow
         {
             var services = new ServiceCollection();
             services.AddSingleton<IWorkflowDefinitionProvider, SimpleProvider>();
-            services.AddSerenityWorkflow();
+            services.AddSerenityWorkflow(o => o.UseInMemoryHistoryStore = true);
             var provider = services.BuildServiceProvider();
             var engine = provider.GetRequiredService<WorkflowEngine>();
             await engine.ExecuteAsync("Test", "Draft", "Submit", null);
@@ -48,7 +48,7 @@ namespace Serenity.Net.Tests.Workflow
         {
             var services = new ServiceCollection();
             services.AddSingleton<IWorkflowDefinitionProvider, SimpleProvider>();
-            services.AddSerenityWorkflow();
+            services.AddSerenityWorkflow(o => o.UseInMemoryHistoryStore = true);
             var provider = services.BuildServiceProvider();
             var engine = provider.GetRequiredService<WorkflowEngine>();
 
