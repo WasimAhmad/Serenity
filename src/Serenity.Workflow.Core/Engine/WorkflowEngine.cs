@@ -104,7 +104,7 @@ namespace Serenity.Workflow
                 var userAccessor = services.GetService<IUserAccessor>();
                 var userName = userAccessor?.User?.Identity?.Name;
 
-                historyStore.RecordEntry(new WorkflowHistoryEntry
+                await historyStore.RecordEntryAsync(new WorkflowHistoryEntry
                 {
                     WorkflowKey = workflowKey,
                     EntityId = entityId,

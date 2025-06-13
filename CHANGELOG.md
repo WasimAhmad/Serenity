@@ -6,6 +6,7 @@
 - Introduced experimental DateOnlyField type. This required changing target framework of Serenity.Net.Services to net8 (was netstandard2.1).
 - Add Oracle-specific SQL type mappings to SqlTypeToFieldTypeMap (#7363)
 - Add support for partial properties for row fields source generator (requires NET9+)
+- Workflow history store can now record entries asynchronously with optional batching support
 
 ### Bugfixes
 - Also invalidate UserRole / UserPermission cache group when saving user as LinkingSetRelation might be updating roles 
