@@ -15,11 +15,12 @@ namespace Serenity.Workflow
         private readonly ConcurrentDictionary<string, Type?> guardTypeCache = new();
         private readonly ConcurrentDictionary<string, Type?> handlerTypeCache = new();
 
-        public WorkflowEngine(IWorkflowDefinitionProvider definitionProvider, IServiceProvider services)
+        public WorkflowEngine(IWorkflowDefinitionProvider definitionProvider,
+            IServiceProvider services, IWorkflowHistoryStore historyStore)
         {
             this.definitionProvider = definitionProvider;
             this.services = services;
-            this.historyStore = services.GetService<IWorkflowHistoryStore>() ?? new InMemoryWorkflowHistoryStore();
+            this.historyStore = historyStore ?? throw new ArgumentNullException(nameof(historyStore));
         }
 
         private StateMachine<string, string> CreateMachine(string workflowKey, string currentState)
