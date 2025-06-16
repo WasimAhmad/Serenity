@@ -1,11 +1,11 @@
 ﻿import { ServiceResponse, ServiceOptions, serviceRequest } from "@serenity-is/corelib";
-import { ExecuteWorkflowActionRequest } from "./ExecuteWorkflowActionRequest";
-import { GetPermittedActionsRequest } from "./GetPermittedActionsRequest";
-import { GetPermittedActionsResponse } from "./GetPermittedActionsResponse";
-import { GetWorkflowDefinitionRequest } from "./GetWorkflowDefinitionRequest";
-import { GetWorkflowDefinitionResponse } from "./GetWorkflowDefinitionResponse";
-import { GetWorkflowHistoryRequest } from "./GetWorkflowHistoryRequest";
-import { GetWorkflowHistoryResponse } from "./GetWorkflowHistoryResponse";
+import { ExecuteWorkflowActionRequest } from "../Web/Workflow.Core.ExecuteWorkflowActionRequest";
+import { GetPermittedActionsRequest } from "../Web/Workflow.Core.GetPermittedActionsRequest";
+import { GetPermittedActionsResponse } from "../Web/Workflow.Core.GetPermittedActionsResponse";
+import { GetWorkflowDefinitionRequest } from "../Web/Workflow.Core.GetWorkflowDefinitionRequest";
+import { GetWorkflowDefinitionResponse } from "../Web/Workflow.Core.GetWorkflowDefinitionResponse";
+import { GetWorkflowHistoryRequest } from "../Web/Workflow.Core.GetWorkflowHistoryRequest";
+import { GetWorkflowHistoryResponse } from "../Web/Workflow.Core.GetWorkflowHistoryResponse";
 
 export namespace WorkflowService {
     export const baseUrl = 'Workflow';

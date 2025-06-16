@@ -1,4 +1,4 @@
-using Serenity.Workflow;
+using Serene.Web.Workflow.Abstractions;
 
 namespace Serene.Tasks;
 

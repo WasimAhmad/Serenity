@@ -24,6 +24,8 @@
     <PackageReference Include="Microsoft.Data.Sqlite" Version="9.0.2" />
     <PackageReference Include="Microsoft.Data.SqlClient" Version="6.0.1" />
     <PackageReference Include="Microsoft.TypeScript.MSBuild" Version="5.7.3" PrivateAssets="all" IncludeAssets="runtime; build; native; contentfiles; analyzers" />
+    <PackageReference Include="Stateless" Version="5.1.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.2" />
   </ItemGroup>
   <ItemGroup Condition="'$(UseProjectRefs)' == 'false'">
     <PackageReference Include="Serenity.Assets" Version="8.8.1" />
@@ -40,13 +42,10 @@
   <ItemGroup Condition="'$(UseProjectRefs)' != 'false'">
     <ProjectReference Include="$(SerenitySrc)Serenity.Assets\Serenity.Assets.csproj" />
     <ProjectReference Include="$(SerenitySrc)Serenity.Net.Web\Serenity.Net.Web.csproj" />
-    <ProjectReference Include="$(SerenitySrc)Serenity.Workflow.Abstractions\Serenity.Workflow.Abstractions.csproj" />
-    <ProjectReference Include="$(SerenitySrc)Serenity.Workflow.Core\Serenity.Workflow.Core.csproj" />
-    <ProjectReference Include="$(SerenitySrc)Serenity.Workflow.DbProvider\Serenity.Workflow.DbProvider.csproj" />
-    <ProjectReference Include="$(SerenitySrc)..\packages\corelib\Serenity.Corelib.csproj" />
     <ProjectReference Include="$(CommonSrc)extensions\Serenity.Extensions.csproj" />
     <ProjectReference Include="$(CommonSrc)demo.northwind\Serenity.Demo.Northwind.csproj" />
     <ProjectReference Include="$(CommonSrc)demo.basicsamples\Serenity.Demo.BasicSamples.csproj" />
+    <ProjectReference Include="$(SerenitySrc)..\packages\corelib\Serenity.Corelib.csproj" />
   </ItemGroup>
   <ItemGroup Condition="'$(UseProjectRefs)' == 'false'">
   </ItemGroup>

@@ -79,6 +79,63 @@ namespace texts {
                 export const Title: string;
             }
         }
+
+        namespace Web {
+
+            namespace Workflow {
+
+                namespace DbProvider {
+
+                    namespace WorkflowHistory {
+                        export const EntityId: string;
+                        export const EventDate: string;
+                        export const FromState: string;
+                        export const Id: string;
+                        export const Input: string;
+                        export const ToState: string;
+                        export const Trigger: string;
+                        export const User: string;
+                        export const WorkflowKey: string;
+                    }
+
+                    namespace WorkflowState {
+                        export const DefinitionId: string;
+                        export const Id: string;
+                        export const Name: string;
+                        export const StateKey: string;
+                    }
+
+                    namespace WorkflowTransition {
+                        export const DefinitionId: string;
+                        export const FromState: string;
+                        export const GuardKey: string;
+                        export const Id: string;
+                        export const ToState: string;
+                        export const TriggerKey: string;
+                    }
+
+                    namespace WorkflowTrigger {
+                        export const DefinitionId: string;
+                        export const FormKey: string;
+                        export const HandlerKey: string;
+                        export const Id: string;
+                        export const Name: string;
+                        export const RequiresInput: string;
+                        export const TriggerKey: string;
+                    }
+                }
+            }
+        }
+
+        namespace Workflow {
+
+            namespace WorkflowDefinition {
+                export const Id: string;
+                export const InitialState: string;
+                export const Name: string;
+                export const WorkflowKey: string;
+            }
+        }
     }
 
     export declare namespace Forms {
@@ -179,6 +236,19 @@ const Texts: typeof texts = proxyTexts({}, '', {
         },
         Tasks: {
             TaskItem: {}
+        },
+        Web: {
+            Workflow: {
+                DbProvider: {
+                    WorkflowHistory: {},
+                    WorkflowState: {},
+                    WorkflowTransition: {},
+                    WorkflowTrigger: {}
+                }
+            }
+        },
+        Workflow: {
+            WorkflowDefinition: {}
         }
     },
     Forms: {

@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Serenity.Services;
-using Serenity.Workflow;
+using Serene.Web.Workflow.Abstractions;
+using Serene.Web.Workflow.Core;
 using System.Linq;
 using System.Threading.Tasks;
 

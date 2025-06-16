@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Serenity.Data;
-using Serenity.Workflow;
+using Serene.Web.Workflow.Abstractions;
 
 namespace Serene.Workflow;
 

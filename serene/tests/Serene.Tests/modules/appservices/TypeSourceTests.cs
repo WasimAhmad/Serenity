@@ -18,7 +18,6 @@ public class TypeSourceTests
             x => Assert.Equal("Serenity.Net.Services", x),
             x => Assert.Equal("Serenity.Net.Web", x),
             x => Assert.Equal("Serenity.Extensions", x),
-            x => Assert.Equal("Serenity.Workflow.DbProvider", x),
             x => Assert.Equal("Serenity.Demo.Northwind", x),
             x => Assert.Equal("Serenity.Demo.BasicSamples", x),
             x => Assert.Equal("Serene.Web", x));

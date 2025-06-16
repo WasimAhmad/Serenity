@@ -1,5 +1,5 @@
 using Serenity.Abstractions;
-using Serenity.Workflow;
+using Serene.Web.Workflow.Abstractions;
 
 namespace Serene.Workflow;
 

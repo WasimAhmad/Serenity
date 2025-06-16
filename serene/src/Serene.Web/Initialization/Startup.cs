@@ -11,8 +11,10 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Serenity.Extensions.DependencyInjection;
 using Serenity.Localization;
-using Serenity.Workflow;
 using System.IO;
+using Serene.Web.Workflow.Abstractions;
+using Serene.Web.Workflow.Core;
+using Serene.Web.Workflow.DbProvider;
 
 namespace Serene;
 
