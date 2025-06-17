@@ -100,6 +100,8 @@ export abstract class WorkflowEntityDialog<TItem, TOptions> extends EntityDialog
             WorkflowKey: this.getWorkflowKey(),
             EntityId: entity[this.getIdProperty()]
         }).then(r => {
+            // remove any existing history button in case multiple calls overlap
+            this.workflowGroup!.querySelector('.workflow-history-button')?.remove();
             if ((r.History?.length ?? 0) > 0) {
                 this.toolbar!.createButton(this.workflowGroup!, {
                     title: 'History',
