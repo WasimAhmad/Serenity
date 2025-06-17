@@ -2,7 +2,7 @@ import { DataGrid, htmlEncode } from "@serenity-is/corelib";
 import { WorkflowService } from "./WorkflowService";
 
 export interface WorkflowHistoryGridMixinOptions<TItem> {
-    workflowKey: string;
+    workflowKey: string | ((item: TItem) => string);
     idField: keyof TItem;
 }
 
@@ -33,6 +33,9 @@ export class WorkflowHistoryGridMixin<TItem> {
         const rowEl = cell.parentElement as HTMLElement;
         const item = this.grid.itemAt(row) as any;
         const id = item[this.options.idField];
+        const workflowKey = typeof this.options.workflowKey === 'function'
+            ? this.options.workflowKey(item)
+            : this.options.workflowKey;
         const detail = document.createElement('div');
         detail.classList.add('workflow-history-detail');
         detail.innerHTML = '<div>Loading...</div>';
@@ -53,7 +56,7 @@ export class WorkflowHistoryGridMixin<TItem> {
         this.detailRow = detail;
         this.rowIndex = row;
         const resp = await WorkflowService.GetHistory({
-            WorkflowKey: this.options.workflowKey,
+            WorkflowKey: workflowKey,
             EntityId: id
         });
         const table = document.createElement('table');

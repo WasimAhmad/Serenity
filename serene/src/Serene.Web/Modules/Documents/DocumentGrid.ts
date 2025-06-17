@@ -1,5 +1,5 @@
 import { EntityGrid, Decorators } from "@serenity-is/corelib";
-import { DocumentRow, DocumentColumns, DocumentService } from "../ServerTypes/Documents";
+import { DocumentRow, DocumentColumns, DocumentService, DocumentType } from "../ServerTypes/Documents";
 import { DocumentDialog } from "./DocumentDialog";
 import { WorkflowHistoryGridMixin } from "../Workflow/Client/WorkflowHistoryGridMixin";
 
@@ -17,7 +17,16 @@ export class DocumentGrid extends EntityGrid<DocumentRow, any> {
     protected override afterInit() {
         super.afterInit();
         this.history = new WorkflowHistoryGridMixin(this, {
-            workflowKey: 'DocumentWorkflow',
+            workflowKey: (item) => {
+                switch (item.DocumentType) {
+                    case DocumentType.Casual:
+                        return 'DocumentWorkflow';
+                    case DocumentType.Annual:
+                        return 'DocumentWorkflow1';
+                    default:
+                        return 'DocumentWorkflow1';
+                }
+            },
             idField: DocumentRow.idProperty as keyof DocumentRow
         });
     }
