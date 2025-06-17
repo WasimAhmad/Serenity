@@ -113,7 +113,9 @@ export abstract class WorkflowEntityDialog<TItem, TOptions> extends EntityDialog
     }
 
     private updateTriggers() {
-        if (!this.workflow || !this.workflowGroup)
+        const workflow = this.workflow;
+        const group = this.workflowGroup;
+        if (!workflow || !group)
             return;
 
         const entity: any = this.entity as any;
@@ -121,12 +123,15 @@ export abstract class WorkflowEntityDialog<TItem, TOptions> extends EntityDialog
             WorkflowKey: this.getWorkflowKey(),
             CurrentState: entity[this.getStateProperty()] ?? ''
         }).then(r => {
+            if (workflow !== this.workflow || !this.workflowGroup)
+                return;
+
             this.workflowGroup!.querySelectorAll('div.tool-button.trigger-button').forEach(el => el.remove());
             if (this.isNewOrDeleted())
                 return;
 
             for (const key of r.Actions ?? []) {
-                const trigger = this.workflow!.Triggers[key];
+                const trigger = workflow.Triggers?.[key];
                 if (!trigger)
                     continue;
                 this.toolbar.createButton(this.workflowGroup!, {
