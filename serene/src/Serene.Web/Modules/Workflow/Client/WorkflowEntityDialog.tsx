@@ -8,14 +8,22 @@ export abstract class WorkflowEntityDialog<TItem, TOptions> extends EntityDialog
     protected abstract getWorkflowKey(): string;
     protected abstract getStateProperty(): keyof TItem;
 
-    private workflow?: WorkflowDefinition;
+    protected workflow?: WorkflowDefinition;
     private workflowGroup?: HTMLElement;
 
     protected async ensureDefinition() {
-        if (this.workflow)
+        const key = this.getWorkflowKey();
+        if (this.workflow?.WorkflowKey === key)
             return;
-        const r = await WorkflowService.GetDefinition({ WorkflowKey: this.getWorkflowKey() });
+        const r = await WorkflowService.GetDefinition({ WorkflowKey: key });
         this.workflow = r.Definition!;
+    }
+
+    protected async reloadWorkflow() {
+        this.workflow = undefined;
+        await this.ensureDefinition();
+        this.updateHistoryButton();
+        this.updateTriggers();
     }
 
     protected override getToolbarButtons(): ToolButton[] {
