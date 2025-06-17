@@ -9,6 +9,7 @@ public static partial class ESM
     public const string ScriptInit = "~/esm/Modules/Common/ScriptInit.js";
     public const string SignUpPage = "~/esm/Modules/Membership/Account/SignUp/SignUpPage.js";
     public const string TaskItemPage = "~/esm/Modules/Tasks/TaskItemPage.js";
+    public const string StepWizardPage = "~/esm/Modules/Samples/StepWizard/StepWizardPage.js";
     public const string TranslationPage = "~/esm/Modules/Administration/Translation/TranslationPage.js";
     public const string UserPage = "~/esm/Modules/Administration/User/UserPage.js";
 
@@ -66,6 +67,11 @@ public static partial class ESM
         public static partial class Tasks
         {
             public const string TaskItemPage = "~/esm/Modules/Tasks/TaskItemPage.js";
+        }
+
+        public static partial class Samples
+        {
+            public const string StepWizardPage = "~/esm/Modules/Samples/StepWizard/StepWizardPage.js";
         }
     }
 }

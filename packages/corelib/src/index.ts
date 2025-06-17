@@ -96,5 +96,6 @@ export * from "./ui/datagrid/entitygrid";
 export * from "./ui/dialogs/entitytoolbuttons";
 export * from "./ui/dialogs/entitylocalizer";
 export * from "./ui/dialogs/entitydialog";
+export * from "./ui/widgets/stepwizard";
 
 export type Constructor<T> = new (...args: any[]) => T;
