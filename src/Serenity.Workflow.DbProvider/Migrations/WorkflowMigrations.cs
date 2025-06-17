@@ -27,7 +27,10 @@ namespace Serenity.Workflow.Migrations
                 .WithColumn("Name").AsString(100).NotNullable()
                 .WithColumn("HandlerKey").AsString(200).Nullable()
                 .WithColumn("RequiresInput").AsBoolean().WithDefaultValue(false)
-                .WithColumn("FormKey").AsString(200).Nullable();
+                .WithColumn("FormKey").AsString(200).Nullable()
+                .WithColumn("PermissionType").AsInt32().Nullable()
+                .WithColumn("Permissions").AsString(int.MaxValue).Nullable()
+                .WithColumn("PermissionHandlerKey").AsString(200).Nullable();
 
             Create.Table("WorkflowTransitions")
                 .WithColumn("Id").AsInt32().PrimaryKey().Identity()
@@ -41,6 +44,9 @@ namespace Serenity.Workflow.Migrations
         public override void Down()
         {
             Delete.Table("WorkflowTransitions");
+            Delete.Column("PermissionHandlerKey").FromTable("WorkflowTriggers");
+            Delete.Column("Permissions").FromTable("WorkflowTriggers");
+            Delete.Column("PermissionType").FromTable("WorkflowTriggers");
             Delete.Table("WorkflowTriggers");
             Delete.Table("WorkflowStates");
             Delete.Table("WorkflowDefinitions");

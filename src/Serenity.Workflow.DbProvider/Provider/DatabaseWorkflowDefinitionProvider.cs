@@ -1,5 +1,8 @@
 using Serenity.Data;
 using Serenity.Workflow;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Serenity.Workflow.Provider
 {
@@ -23,7 +26,16 @@ namespace Serenity.Workflow.Provider
             def.States = connection.List<Entities.WorkflowStateRow>(Entities.WorkflowStateRow.Fields.DefinitionId == definition.Id!.Value)
                 .ToDictionary(x => x.StateKey! , x => new WorkflowState { StateKey = x.StateKey!, DisplayName = x.Name });
             def.Triggers = connection.List<Entities.WorkflowTriggerRow>(Entities.WorkflowTriggerRow.Fields.DefinitionId == definition.Id!.Value)
-                .ToDictionary(x => x.TriggerKey!, x => new WorkflowTrigger { TriggerKey = x.TriggerKey!, DisplayName = x.Name, HandlerKey = x.HandlerKey, RequiresInput = x.RequiresInput ?? false, FormKey = x.FormKey });
+                .ToDictionary(x => x.TriggerKey!, x => new WorkflowTrigger {
+                    TriggerKey = x.TriggerKey!,
+                    DisplayName = x.Name,
+                    HandlerKey = x.HandlerKey,
+                    RequiresInput = x.RequiresInput ?? false,
+                    FormKey = x.FormKey,
+                    PermissionType = (PermissionGrantType)(x.PermissionType ?? (int)PermissionGrantType.Explicit),
+                    Permissions = string.IsNullOrEmpty(x.Permissions) ? new List<string>() : x.Permissions.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).ToList(),
+                    PermissionHandlerKey = x.PermissionHandlerKey
+                });
             def.Transitions = connection.List<Entities.WorkflowTransitionRow>(Entities.WorkflowTransitionRow.Fields.DefinitionId == definition.Id!.Value)
                 .Select(x => new WorkflowTransition { From = x.FromState!, To = x.ToState!, Trigger = x.TriggerKey!, GuardKey = x.GuardKey }).ToList();
             return def;

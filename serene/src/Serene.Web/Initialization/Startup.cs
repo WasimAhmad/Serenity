@@ -12,6 +12,7 @@ using Microsoft.Extensions.Hosting;
 using Serenity.Extensions.DependencyInjection;
 using Serenity.Localization;
 using Serenity.Workflow;
+using Serene.Workflow; // For DocumentWorkflowPermissionHandler
 using System.IO;
 
 namespace Serene;
@@ -109,6 +110,8 @@ public partial class Startup
         services.AddReporting();
         services.AddWorkflowDbProvider();
         services.AddSerenityWorkflow();
+        // Register custom workflow permission handler
+        services.AddSingleton<Serenity.Workflow.IWorkflowPermissionHandler, DocumentWorkflowPermissionHandler>();
         services.AddTransient<Workflow.StartTaskWorkflowHandler>();
         services.AddTransient<Workflow.FinishTaskWorkflowHandler>();
         services.AddTransient<Workflow.SubmitDocumentWorkflowHandler>();
