@@ -13,6 +13,8 @@ export class DocumentDialog extends WorkflowEntityDialog<DocumentRow, any> {
 
     protected form = new DocumentForm(this.idPrefix);
 
+    //protected getWorkflowKey() { return 'DocumentWorkflow'; }
+    protected getStateProperty(): keyof DocumentRow { return 'State'; }
     constructor() {
         super();
         this.form.DocumentType.changeSelect2(() => {
@@ -20,7 +22,6 @@ export class DocumentDialog extends WorkflowEntityDialog<DocumentRow, any> {
         });
     }
 
-    //protected getWorkflowKey() { return 'DocumentWorkflow'; }
 
     protected getWorkflowKey() {
         switch (this.form.DocumentType.value) {
@@ -39,5 +40,4 @@ export class DocumentDialog extends WorkflowEntityDialog<DocumentRow, any> {
         this.reloadWorkflow();
     }
 
-    protected getStateProperty(): keyof DocumentRow { return 'State'; }
 }
