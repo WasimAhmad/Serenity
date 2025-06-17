@@ -13,7 +13,7 @@ export class DocumentDialog extends WorkflowEntityDialog<DocumentRow, any> {
 
     protected form = new DocumentForm(this.idPrefix);
 
-    //protected getWorkflowKey() { return 'DocumentWorkflow'; }
+    protected getWorkflowKey() { return 'DocumentWorkflow'; }
     protected getStateProperty(): keyof DocumentRow { return 'State'; }
     constructor() {
         super();
@@ -23,16 +23,16 @@ export class DocumentDialog extends WorkflowEntityDialog<DocumentRow, any> {
     }
 
 
-    protected getWorkflowKey() {
-        switch (this.form.DocumentType.value) {
-            case DocumentType.Public.toString():
-                return 'DocumentWorkflow';
-            case DocumentType.Internal.toString():
-                return 'DocumentWorkflow1';
-            default:
-                return 'DocumentWorkflow1';
-        }
-    }
+    //protected getWorkflowKey() {
+    //    switch (this.form.DocumentType.value) {
+    //        case DocumentType.Public.toString():
+    //            return 'DocumentWorkflow';
+    //        case DocumentType.Internal.toString():
+    //            return 'DocumentWorkflow1';
+    //        default:
+    //            return 'DocumentWorkflow1';
+    //    }
+    //}
 
 
     protected override afterLoadEntity() {

@@ -1,6 +1,6 @@
 namespace Serenity.TestUtils;
 
-public sealed class MockUserPermissionRow : Row<MockUserPermissionRow.RowFields>, IUserPermissionRow
+public sealed class MockUserPermissionRow : Row<MockUserPermissionRow.RowFields>, Data.IUserPermissionRow
 {
     public int? UserId { get => fields.UserId[this]; set => fields.UserId[this] = value; }
 

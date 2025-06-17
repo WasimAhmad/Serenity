@@ -57,7 +57,7 @@ export abstract class WorkflowEntityDialog<TItem, TOptions> extends EntityDialog
                 WorkflowKey: this.getWorkflowKey(),
                 CurrentState: entity[this.getStateProperty()] ?? '',
                 Trigger: triggerKey,
-                Input: { EntityId: entity[this.getIdProperty()], ...input }
+                Input: { EntityId: entity[this.getIdProperty()], Entity: this.entity, ...input }
             }).then(() => {
                 this.loadById(entity[this.getIdProperty()]);
                 SubDialogHelper.triggerDataChange(this);

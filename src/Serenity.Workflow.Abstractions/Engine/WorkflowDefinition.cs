@@ -12,11 +12,6 @@ namespace Serenity.Workflow
         /// is explicitly listed in the trigger's Permissions list.
         /// </summary>
         Explicit,
-        ///// <summary>
-        ///// Permission is determined by a hierarchical structure (e.g., organizational chart).
-        ///// Requires custom logic or an IWorkflowPermissionHandler implementation.
-        ///// </summary>
-        //Hierarchy,
         /// <summary>
         /// Permission is determined by a registered IWorkflowPermissionHandler.
         /// The specific handler can be resolved via services, possibly using HandlerKey from the trigger.

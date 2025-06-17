@@ -1,7 +1,8 @@
-using Serenity.Workflow;
 using Serene.Documents;
+using Serenity.Workflow;
 using System;
 using System.Security.Claims;
+using System.Text.Json;
 // For IsInRole, ClaimsPrincipal extensions are usually in System.Security.Claims
 // For IPermissionService or Authorization related utilities, if needed:
 // using Serenity.Abstractions; or using Serenity.Authorization;
@@ -29,12 +30,39 @@ namespace Serene.Workflow
             if (user == null)
                 return false;
 
-            if (entity is not DocumentRow document)
+            DocumentRow? document = null;
+
+            if (entity is DocumentRow doc)
+                document = doc;
+            else if (entity is JsonElement json)
+            {
+                try
+                {
+                    document = JsonSerializer.Deserialize<DocumentRow>(json.GetRawText());
+                }
+                catch (JsonException)
+                {
+                    document = null;
+                }
+            }
+            else if (entity is IDictionary<string, object?> dict)
+            {
+                try
+                {
+                    var serialized = Serenity.JSON.Stringify(dict, writeNulls: true);
+                    document = Serenity.JSON.Parse<DocumentRow>(serialized);
+                }
+                catch (JsonException)
+                {
+                    document = null;
+                }
+            }
+
+            if (document == null)
             {
                 // This handler is only for DocumentRow entities
                 return false;
             }
-
             // The PermissionHandlerKey from the trigger could be used here if different document-related
             // permissions need different handling by this one class. For example, trigger.PermissionHandlerKey == "ReviewPermission".
             // For now, we'll assume this handler is specifically assigned to triggers where this logic applies.
