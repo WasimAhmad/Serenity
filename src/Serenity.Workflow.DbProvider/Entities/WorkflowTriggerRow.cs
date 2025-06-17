@@ -15,6 +15,9 @@ namespace Serenity.Workflow.Entities
         public string? HandlerKey { get => fields.HandlerKey[this]; set => fields.HandlerKey[this] = value; }
         public bool? RequiresInput { get => fields.RequiresInput[this]; set => fields.RequiresInput[this] = value; }
         public string? FormKey { get => fields.FormKey[this]; set => fields.FormKey[this] = value; }
+        public int? PermissionType { get => fields.PermissionType[this]; set => fields.PermissionType[this] = value; }
+        public string? Permissions { get => fields.Permissions[this]; set => fields.Permissions[this] = value; }
+        public string? PermissionHandlerKey { get => fields.PermissionHandlerKey[this]; set => fields.PermissionHandlerKey[this] = value; }
 
         public class RowFields : RowFieldsBase
         {
@@ -25,6 +28,9 @@ namespace Serenity.Workflow.Entities
             public StringField HandlerKey;
             public BooleanField RequiresInput;
             public StringField FormKey;
+            public Int32Field PermissionType;
+            public StringField Permissions;
+            public StringField PermissionHandlerKey;
         }
     }
 }

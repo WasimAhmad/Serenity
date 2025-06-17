@@ -1,9 +1,12 @@
 using Microsoft.Extensions.DependencyInjection;
+using Serenity.Abstractions;
+using Serenity.Services;
 using Stateless;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
-using Serenity.Abstractions;
 
 namespace Serenity.Workflow
 {
@@ -13,6 +16,7 @@ namespace Serenity.Workflow
         private readonly IServiceProvider services;
         private readonly IWorkflowHistoryStore historyStore;
         private readonly WorkflowEngineOptions options;
+        private readonly IUserAccessor _userAccessor;
         private readonly ConcurrentDictionary<string, Type?> guardTypeCache = new();
         private readonly ConcurrentDictionary<string, Type?> handlerTypeCache = new();
         private static readonly ConcurrentDictionary<string, Type> resolvedTypes = new();
@@ -20,12 +24,13 @@ namespace Serenity.Workflow
 
         public WorkflowEngine(IWorkflowDefinitionProvider definitionProvider,
             IServiceProvider services, IWorkflowHistoryStore historyStore,
-            WorkflowEngineOptions options)
+            WorkflowEngineOptions options, IUserAccessor userAccessor)
         {
             this.definitionProvider = definitionProvider;
             this.services = services;
             this.historyStore = historyStore ?? throw new ArgumentNullException(nameof(historyStore));
             this.options = options;
+            this._userAccessor = userAccessor ?? throw new ArgumentNullException(nameof(userAccessor));
         }
 
         private StateMachine<string, string> CreateMachine(string workflowKey, string currentState)
@@ -115,8 +120,69 @@ namespace Serenity.Workflow
             if (!machine.CanFire(trigger))
                 throw new InvalidOperationException($"Trigger '{trigger}' cannot be fired from state '{currentState}' for workflow '{workflowKey}'");
 
-            WorkflowTrigger? action = null;
-            def.Triggers.TryGetValue(trigger, out action);
+            // WorkflowTrigger? action = null;
+            // def.Triggers.TryGetValue(trigger, out action);
+            // Ensure action is not null, which it shouldn't be if CanFire passed and trigger is in def.Triggers
+            if (!def.Triggers.TryGetValue(trigger, out var action) || action == null)
+            {
+                // This case should ideally be caught by earlier checks or CanFire logic
+                throw new InvalidOperationException($"Trigger '{trigger}' definition not found or is invalid for workflow '{workflowKey}'.");
+            }
+
+            // Permission Check
+            var currentUserIdentifier = _userAccessor.User?.GetIdentifier();
+            if (string.IsNullOrEmpty(currentUserIdentifier))
+            {
+                throw new ValidationError("User not authenticated or identifier not available. Cannot execute workflow action.");
+            }
+
+            if (action.PermissionType == PermissionGrantType.Explicit)
+            {
+                if (action.Permissions == null || !action.Permissions.Contains(currentUserIdentifier))
+                {
+                    throw new ValidationError("Not authorized to execute this action.");
+                }
+            }
+            else if (action.PermissionType == PermissionGrantType.Hierarchy)
+            {
+                // TODO: Implement hierarchical permission check
+                throw new ValidationError("Hierarchical permissions are not yet implemented. Access denied.");
+            }
+            else if (action.PermissionType == PermissionGrantType.Handler)
+            {
+                if (string.IsNullOrEmpty(action.PermissionHandlerKey))
+                {
+                    // As per subtask, throw if key is missing.
+                    // Alternatively, one might try to resolve a default handler if key is null/empty.
+                    throw new ValidationError("Permission handler key is missing for handler-based permission.");
+                }
+
+                // Resolve the single IWorkflowPermissionHandler.
+                // Users needing multiple distinct handlers should register a factory/broker handler
+                // that internally dispatches based on PermissionHandlerKey or other trigger properties.
+                var permissionHandler = services.GetService(typeof(IWorkflowPermissionHandler)) as IWorkflowPermissionHandler;
+                if (permissionHandler == null)
+                {
+                    throw new ValidationError($"No IWorkflowPermissionHandler registered in DI. Cannot process handler-based permission for trigger '{action.TriggerKey}'.");
+                }
+
+                object? entity = null;
+                input?.TryGetValue("Entity", out entity);
+
+                // Ensure _userAccessor.User is not null before passing. The check for currentUserIdentifier handles this.
+                // However, IsAuthorized expects ClaimsPrincipal which could be from a non-null _userAccessor.User.
+                if (_userAccessor.User == null)
+                {
+                     // This should have been caught by the string.IsNullOrEmpty(currentUserIdentifier) check earlier,
+                     // but as a safeguard before calling IsAuthorized:
+                    throw new ValidationError("User not available for handler-based permission check.");
+                }
+
+                if (!permissionHandler.IsAuthorized(_userAccessor.User, action, entity, services))
+                {
+                    throw new ValidationError($"Not authorized by permission handler for trigger '{action.TriggerKey}'.");
+                }
+            }
 
             IWorkflowActionHandler? handler = null;
             if (action?.HandlerKey != null)

@@ -61,13 +61,17 @@ public class WorkflowDefinitionProvider : IWorkflowDefinitionProvider
                         DisplayName = "Submit",
                         HandlerKey = typeof(Workflow.SubmitDocumentWorkflowHandler).FullName,
                         RequiresInput = true,
-                        FormKey = "Workflow.DocumentSubmit"
+                        FormKey = "Workflow.DocumentSubmit",
+                        PermissionType = PermissionGrantType.Handler,
+                        PermissionHandlerKey = "DocumentWorkflowPermission"
                     },
                     ["StartReview"] = new WorkflowTrigger
                     {
                         TriggerKey = "StartReview",
                         DisplayName = "Start Review",
-                        HandlerKey = typeof(Workflow.StartReviewDocumentWorkflowHandler).FullName
+                        HandlerKey = typeof(Workflow.StartReviewDocumentWorkflowHandler).FullName,
+                        PermissionType = PermissionGrantType.Handler,
+                        PermissionHandlerKey = "DocumentWorkflowPermission"
                     },
                     ["RequestChanges"] = new WorkflowTrigger
                     {
@@ -75,7 +79,9 @@ public class WorkflowDefinitionProvider : IWorkflowDefinitionProvider
                         DisplayName = "Request Changes",
                         HandlerKey = typeof(Workflow.RequestChangesDocumentWorkflowHandler).FullName,
                         RequiresInput = true,
-                        FormKey = "Workflow.DocumentRequestChanges"
+                        FormKey = "Workflow.DocumentRequestChanges",
+                        PermissionType = PermissionGrantType.Handler,
+                        PermissionHandlerKey = "DocumentWorkflowPermission"
                     },
                     ["Resubmit"] = new WorkflowTrigger
                     {
@@ -83,19 +89,25 @@ public class WorkflowDefinitionProvider : IWorkflowDefinitionProvider
                         DisplayName = "Resubmit",
                         HandlerKey = typeof(Workflow.ResubmitDocumentWorkflowHandler).FullName,
                         RequiresInput = true,
-                        FormKey = "Workflow.DocumentResubmit"
+                        FormKey = "Workflow.DocumentResubmit",
+                        PermissionType = PermissionGrantType.Handler,
+                        PermissionHandlerKey = "DocumentWorkflowPermission"
                     },
                     ["StartFinalReview"] = new WorkflowTrigger
                     {
                         TriggerKey = "StartFinalReview",
                         DisplayName = "Start Final Review",
-                        HandlerKey = typeof(Workflow.StartFinalReviewDocumentWorkflowHandler).FullName
+                        HandlerKey = typeof(Workflow.StartFinalReviewDocumentWorkflowHandler).FullName,
+                        PermissionType = PermissionGrantType.Handler,
+                        PermissionHandlerKey = "DocumentWorkflowPermission"
                     },
                     ["Approve"] = new WorkflowTrigger
                     {
                         TriggerKey = "Approve",
                         DisplayName = "Approve",
-                        HandlerKey = typeof(Workflow.ApproveDocumentWorkflowHandler).FullName
+                        HandlerKey = typeof(Workflow.ApproveDocumentWorkflowHandler).FullName,
+                        PermissionType = PermissionGrantType.Handler,
+                        PermissionHandlerKey = "DocumentWorkflowPermission"
                     },
                     ["Reject"] = new WorkflowTrigger
                     {
@@ -103,7 +115,9 @@ public class WorkflowDefinitionProvider : IWorkflowDefinitionProvider
                         DisplayName = "Reject",
                         HandlerKey = typeof(Workflow.RejectDocumentWorkflowHandler).FullName,
                         RequiresInput = true,
-                        FormKey = "Workflow.DocumentReject"
+                        FormKey = "Workflow.DocumentReject",
+                        PermissionType = PermissionGrantType.Handler,
+                        PermissionHandlerKey = "DocumentWorkflowPermission"
                     }
                 },
                 Transitions = new()
