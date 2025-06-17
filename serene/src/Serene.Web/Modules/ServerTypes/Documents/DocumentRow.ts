@@ -1,9 +1,11 @@
 ﻿import { fieldsProxy } from "@serenity-is/corelib";
+import { DocumentType } from "./DocumentType";
 
 export interface DocumentRow {
     DocumentId?: number;
     Title?: string;
     State?: string;
+    DocumentType?: DocumentType;
 }
 
 export abstract class DocumentRow {

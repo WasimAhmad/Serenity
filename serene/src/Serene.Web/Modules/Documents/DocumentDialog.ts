@@ -1,5 +1,5 @@
 import { Decorators } from "@serenity-is/corelib";
-import { DocumentRow, DocumentForm, DocumentService } from "../ServerTypes/Documents";
+import { DocumentRow, DocumentForm, DocumentService,DocumentType } from "../ServerTypes/Documents";
 import { WorkflowEntityDialog } from "../Workflow/Client/WorkflowEntityDialog";
 
 @Decorators.panel(false)
@@ -13,6 +13,18 @@ export class DocumentDialog extends WorkflowEntityDialog<DocumentRow, any> {
 
     protected form = new DocumentForm(this.idPrefix);
 
-    protected getWorkflowKey() { return 'DocumentWorkflow'; }
+    //protected getWorkflowKey() { return 'DocumentWorkflow'; }
+
+    protected getWorkflowKey() {
+        switch (this.form.DocumentType.value) {
+            case DocumentType.Casual.toString():
+                return 'DocumentWorkflow';
+            case DocumentType.Annual.toString():
+                return 'DocumentWorkflow1';
+            default:
+                return 'DocumentWorkflow1';
+        }
+    }
+
     protected getStateProperty(): keyof DocumentRow { return 'State'; }
 }

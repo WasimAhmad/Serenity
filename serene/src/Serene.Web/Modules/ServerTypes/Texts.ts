@@ -66,6 +66,7 @@ namespace texts {
 
             namespace Document {
                 export const DocumentId: string;
+                export const DocumentType: string;
                 export const State: string;
                 export const Title: string;
             }

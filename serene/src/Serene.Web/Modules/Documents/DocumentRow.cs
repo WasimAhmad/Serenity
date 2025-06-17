@@ -6,7 +6,7 @@ namespace Serene.Documents;
 [DisplayName("Documents"), InstanceName("Document")]
 [ReadPermission("Document:View")]
 [ModifyPermission("Document:Modify")]
-[WorkflowEnabled("DocumentWorkflow")]
+[WorkflowEnabled("DocumentWorkflow1")]
 public sealed class DocumentRow : Row<DocumentRow.RowFields>, IIdRow, INameRow
 {
     [DisplayName("Document Id"), Identity, IdProperty]
@@ -14,6 +14,17 @@ public sealed class DocumentRow : Row<DocumentRow.RowFields>, IIdRow, INameRow
 
     [DisplayName("Title"), Size(100), NotNull, QuickSearch, NameProperty]
     public string Title { get => fields.Title[this]; set => fields.Title[this] = value; }
+
+
+    //[DisplayName("DocumentType")]
+    //public DocumentType? DocumentType
+    //{
+    //    get => fields.DocumentType[this];
+    //    set => fields.DocumentType[this] = value;
+    //}
+
+    [DisplayName("Type"), NotNull]
+    public DocumentType? DocumentType { get => (DocumentType?)fields.DocumentType[this]; set => fields.DocumentType[this] = value; }
 
     [DisplayName("State"), Size(50), NotNull]
     [WorkflowStateField]
@@ -24,5 +35,6 @@ public sealed class DocumentRow : Row<DocumentRow.RowFields>, IIdRow, INameRow
         public Int32Field DocumentId;
         public StringField Title;
         public StringField State;
+        public EnumField<DocumentType> DocumentType;
     }
 }
