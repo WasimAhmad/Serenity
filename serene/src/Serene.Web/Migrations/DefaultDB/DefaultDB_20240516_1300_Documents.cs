@@ -10,6 +10,7 @@ public class DefaultDB_20240516_1300_Documents : AutoReversingMigration
         Create.Table("Documents")
             .WithColumn("DocumentId").AsInt32().Identity().PrimaryKey()
             .WithColumn("Title").AsString(100).NotNullable()
+            .WithColumn("DocumentType").AsInt16().NotNullable().WithDefaultValue(1)
             .WithColumn("State").AsString(50).NotNullable();
     }
 }

@@ -25,9 +25,9 @@ export class DocumentDialog extends WorkflowEntityDialog<DocumentRow, any> {
 
     protected getWorkflowKey() {
         switch (this.form.DocumentType.value) {
-            case DocumentType.Casual.toString():
+            case DocumentType.Public.toString():
                 return 'DocumentWorkflow';
-            case DocumentType.Annual.toString():
+            case DocumentType.Internal.toString():
                 return 'DocumentWorkflow1';
             default:
                 return 'DocumentWorkflow1';
