@@ -3,6 +3,7 @@
     <ProjectReference Include="..\..\src\Serenity.Net.Web\Serenity.Net.Web.csproj" />
     <ProjectReference Include="..\..\src\Serenity.Workflow.Abstractions\Serenity.Workflow.Abstractions.csproj" />
     <ProjectReference Include="..\..\src\Serenity.Workflow.Core\Serenity.Workflow.Core.csproj" />
+    <PackageReference Include="Moq" Version="4.20.72" />
     <PackageReference Include="TSQL.Parser" Version="2.6.0" />
     <Using Include="Microsoft.AspNetCore.Hosting" />
     <Using Include="Microsoft.AspNetCore.Http" />

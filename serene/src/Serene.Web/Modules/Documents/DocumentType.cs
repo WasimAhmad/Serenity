@@ -1,6 +1,6 @@
 using System.ComponentModel;
 
-namespace Serene.Modules.Documents // Corrected namespace based on previous subtask's DocumentWorkflowPermissionHandler
+namespace Serene.Documents
 {
     /// <summary>
     /// Represents the type of a document, influencing its accessibility and handling.

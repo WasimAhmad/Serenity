@@ -143,11 +143,6 @@ namespace Serenity.Workflow
                     throw new ValidationError("Not authorized to execute this action.");
                 }
             }
-            else if (action.PermissionType == PermissionGrantType.Hierarchy)
-            {
-                // TODO: Implement hierarchical permission check
-                throw new ValidationError("Hierarchical permissions are not yet implemented. Access denied.");
-            }
             else if (action.PermissionType == PermissionGrantType.Handler)
             {
                 if (string.IsNullOrEmpty(action.PermissionHandlerKey))

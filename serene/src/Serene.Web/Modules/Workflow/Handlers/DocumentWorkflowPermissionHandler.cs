@@ -1,5 +1,5 @@
 using Serenity.Workflow;
-using Serene.Modules.Documents; // Assuming DocumentRow and DocumentType are here
+using Serene.Documents;
 using System;
 using System.Security.Claims;
 // For IsInRole, ClaimsPrincipal extensions are usually in System.Security.Claims
