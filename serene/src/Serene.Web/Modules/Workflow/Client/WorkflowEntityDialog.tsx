@@ -35,14 +35,7 @@ export abstract class WorkflowEntityDialog<TItem, TOptions> extends EntityDialog
             group = group.parentElement!.appendChild(<div class="tool-group workflow-group" />);
             this.workflowGroup = group as HTMLElement;
 
-            this.toolbar.createButton(group, {
-                title: 'History',
-                cssClass: 'workflow-history-button',
-                icon: 'fa-history text-green',
-                separator: 'right',
-                onClick: () => this.showHistory()
-            });
-
+            this.updateHistoryButton();
             this.updateTriggers();
         });
     }
@@ -85,6 +78,32 @@ export abstract class WorkflowEntityDialog<TItem, TOptions> extends EntityDialog
             });
     }
 
+    private updateHistoryButton() {
+        if (!this.workflowGroup)
+            return;
+
+        this.workflowGroup.querySelector('.workflow-history-button')?.remove();
+
+        if (this.isNewOrDeleted())
+            return;
+
+        const entity: any = this.entity as any;
+        WorkflowService.GetHistory({
+            WorkflowKey: this.getWorkflowKey(),
+            EntityId: entity[this.getIdProperty()]
+        }).then(r => {
+            if ((r.History?.length ?? 0) > 0) {
+                this.toolbar!.createButton(this.workflowGroup!, {
+                    title: 'History',
+                    cssClass: 'workflow-history-button',
+                    icon: 'fa-history text-green',
+                    separator: 'right',
+                    onClick: () => this.showHistory()
+                });
+            }
+        });
+    }
+
     private updateTriggers() {
         if (!this.workflow || !this.workflowGroup)
             return;
@@ -114,6 +133,12 @@ export abstract class WorkflowEntityDialog<TItem, TOptions> extends EntityDialog
 
     protected override updateInterface() {
         super.updateInterface();
+        this.updateHistoryButton();
         this.updateTriggers();
+    }
+
+    protected override afterLoadEntity(): void {
+        super.afterLoadEntity();
+        this.updateHistoryButton();
     }
 }
