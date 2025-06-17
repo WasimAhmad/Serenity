@@ -1,4 +1,4 @@
-import { EntityDialog, ToolButton, Decorators, PropertyDialog } from "@serenity-is/corelib";
+import { EntityDialog, ToolButton, Decorators, PropertyDialog, SubDialogHelper } from "@serenity-is/corelib";
 import { WorkflowService, WorkflowDefinition } from "./WorkflowService";
 import { WorkflowHistoryDialog } from "./WorkflowHistoryDialog";
 
@@ -58,7 +58,10 @@ export abstract class WorkflowEntityDialog<TItem, TOptions> extends EntityDialog
                 CurrentState: entity[this.getStateProperty()] ?? '',
                 Trigger: triggerKey,
                 Input: { EntityId: entity[this.getIdProperty()], ...input }
-            }).then(() => this.loadById(entity[this.getIdProperty()]));
+            }).then(() => {
+                this.loadById(entity[this.getIdProperty()]);
+                SubDialogHelper.triggerDataChange(this);
+            });
         };
 
         if (trigger?.RequiresInput && trigger.FormKey) {

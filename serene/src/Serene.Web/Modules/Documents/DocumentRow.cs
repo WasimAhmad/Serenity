@@ -5,8 +5,12 @@ namespace Serene.Documents;
 [ConnectionKey("Default"), Module("Documents"), TableName("Documents")]
 [DisplayName("Documents"), InstanceName("Document")]
 [ReadPermission("Document:View")]
+//[InsertPermission("Document:View")]
+//[UpdatePermission("Document:View")]
+//[DeletePermission("Document:View")]
+
 [ModifyPermission("Document:Modify")]
-[WorkflowEnabled("DocumentWorkflow1")]
+//[WorkflowEnabled("DocumentWorkflow")]
 public sealed class DocumentRow : Row<DocumentRow.RowFields>, IIdRow, INameRow
 {
     [DisplayName("Document Id"), Identity, IdProperty]
@@ -16,18 +20,18 @@ public sealed class DocumentRow : Row<DocumentRow.RowFields>, IIdRow, INameRow
     public string Title { get => fields.Title[this]; set => fields.Title[this] = value; }
 
 
-    //[DisplayName("DocumentType")]
-    //public DocumentType? DocumentType
-    //{
-    //    get => fields.DocumentType[this];
-    //    set => fields.DocumentType[this] = value;
-    //}
-
     [DisplayName("Type"), NotNull]
-    public DocumentType? DocumentType { get => (DocumentType?)fields.DocumentType[this]; set => fields.DocumentType[this] = value; }
+    public DocumentType? DocumentType
+    {
+        get => fields.DocumentType[this];
+        set => fields.DocumentType[this] = value;
+    }
+
+    //[DisplayName("Type"), NotNull]
+    //public DocumentType? DocumentType { get => (DocumentType?)fields.DocumentType[this]; set => fields.DocumentType[this] = value; }
 
     [DisplayName("State"), Size(50), NotNull]
-    [WorkflowStateField]
+    //[WorkflowStateField]
     public string State { get => fields.State[this]; set => fields.State[this] = value; }
 
     public class RowFields : RowFieldsBase
