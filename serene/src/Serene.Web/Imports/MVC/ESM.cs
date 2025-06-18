@@ -11,6 +11,7 @@ public static partial class ESM
     public const string TaskItemPage = "~/esm/Modules/Tasks/TaskItemPage.js";
     public const string TranslationPage = "~/esm/Modules/Administration/Translation/TranslationPage.js";
     public const string UserPage = "~/esm/Modules/Administration/User/UserPage.js";
+    public const string WorkflowDesignerPage = "~/esm/Modules/WorkflowDesigner/WorkflowDesignerPage.js";
 
     public static partial class Modules
     {
@@ -66,6 +67,11 @@ public static partial class ESM
         public static partial class Tasks
         {
             public const string TaskItemPage = "~/esm/Modules/Tasks/TaskItemPage.js";
+        }
+
+        public static partial class WorkflowDesigner
+        {
+            public const string WorkflowDesignerPage = "~/esm/Modules/WorkflowDesigner/WorkflowDesignerPage.js";
         }
     }
 }
