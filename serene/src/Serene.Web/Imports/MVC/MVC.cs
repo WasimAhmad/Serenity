@@ -44,5 +44,13 @@ public static partial class MVC
             public const string _Sidebar = "~/Views/Shared/_Sidebar.cshtml";
             public const string Error = "~/Views/Shared/Error.cshtml";
         }
+
+        public static partial class Workflow
+        {
+            public static partial class WorkflowDesigner
+            {
+                public const string WorkflowDesignerPage = "~/Modules/Workflow/WorkflowDesigner/WorkflowDesignerPage.cshtml";
+            }
+        }
     }
 }

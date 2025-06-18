@@ -191,9 +191,9 @@ export default function WorkflowDesignerPage() {
                         };
                     });
                     setEdges(loadedEdges);
-                    alert(\`Workflow '\${currentDefinitionId}' loaded.\`);
+                    alert('Workflow ' + currentDefinitionId + ' loaded.');
                 } else {
-                    alert(\`Workflow '\${currentDefinitionId}' not found or empty.\`);
+                    alert('Workflow ' + currentDefinitionId + ' not found or empty.');
                     // Reset to initial state if definition is not found or empty
                     setNodes(initialNodes);
                     setEdges(initialEdges);
@@ -203,7 +203,7 @@ export default function WorkflowDesignerPage() {
             },
             onError: (error) => {
                 console.error("Retrieve Error:", error);
-                alert(\`Error loading workflow: \${error.message || 'Unknown error'}\`);
+                alert('Error loading workflow: ' + (error.message || 'Unknown error'));
             }
         });
     }, [currentDefinitionId]);
@@ -239,11 +239,11 @@ export default function WorkflowDesignerPage() {
             request: { Definition: apiDefinition } as WorkflowDefinitionSaveRequest,
             onSuccess: (response) => {
                 console.log("Save Response:", response);
-                alert(\`Workflow '\${currentDefinitionId}' saved successfully.\`);
+                alert('Workflow ' + currentDefinitionId + ' saved successfully.');
             },
             onError: (error) => {
                 console.error("Save Error:", error);
-                alert(\`Error saving workflow: \${error.message || 'Unknown error'}\`);
+                alert('Error saving workflow: ' + (error.message || 'Unknown error'));
             }
         });
     }, [currentDefinitionId, currentDefinitionName, nodes, edges, triggers]);
@@ -254,11 +254,11 @@ export default function WorkflowDesignerPage() {
             request: {} as WorkflowDefinitionListRequest,
             onSuccess: (response) => {
                 console.log("List Response:", response);
-                alert(\`Found \${response.Entities?.length || 0} definitions. Check console for details.\`);
+                alert('Found ' + (response.Entities?.length || 0) + ' definitions. Check console for details.');
             },
             onError: (error) => {
                 console.error("List Error:", error);
-                alert(\`Error listing workflows: \${error.message || 'Unknown error'}\`);
+                alert('Error listing workflows: ' + (error.message || 'Unknown error'));
             }
         });
     }, []);
@@ -268,14 +268,14 @@ export default function WorkflowDesignerPage() {
             alert("Please enter a Definition ID to delete.");
             return;
         }
-        if (!confirm(\`Are you sure you want to delete workflow '\${currentDefinitionId}'?\`)) return;
+        if (!confirm('Are you sure you want to delete workflow ' + currentDefinitionId + '?')) return;
 
         serviceCall({
             url: WorkflowDefinitionManagementService.Methods.Delete,
             request: { DefinitionId: currentDefinitionId } as WorkflowDefinitionDeleteRequest,
             onSuccess: (response) => {
                 console.log("Delete Response:", response);
-                alert(\`Workflow '\${currentDefinitionId}' delete request sent.\`);
+                alert('Workflow ' + currentDefinitionId + ' delete request sent.');
                 setNodes(initialNodes);
                 setEdges(initialEdges);
                 setTriggers([]);
@@ -284,7 +284,7 @@ export default function WorkflowDesignerPage() {
             },
             onError: (error) => {
                 console.error("Delete Error:", error);
-                alert(\`Error deleting workflow: \${error.message || 'Unknown error'}\`);
+                alert('Error deleting workflow: ' + (error.message || 'Unknown error'));
             }
         });
     }, [currentDefinitionId]);
