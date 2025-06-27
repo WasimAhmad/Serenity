@@ -85,10 +85,18 @@ public class LocalTextRegistry : ILocalTextRegistry, IRemoveAll, IGetAllTexts, I
         }
     }
 
-    internal void RegisterJsonLoader(string languageID, Func<Dictionary<string, object>?> loader)
+    /// <summary>
+    /// Registers a lazy JSON loader for a language.
+    /// </summary>
+    /// <param name="languageID">Language ID to register for.</param>
+    /// <param name="loader">Loader delegate returning the JSON dictionary.</param>
+    public void RegisterJsonLoader(string languageID, Func<Dictionary<string, object>?> loader)
     {
-        ArgumentNullException.ThrowIfNull(languageID);
-        ArgumentNullException.ThrowIfNull(loader);
+        if (languageID == null)
+            throw new ArgumentNullException(nameof(languageID));
+
+        if (loader == null)
+            throw new ArgumentNullException(nameof(loader));
 
         var list = lazyJsonTexts.GetOrAdd(languageID, static _ => []);
         lock (list)
