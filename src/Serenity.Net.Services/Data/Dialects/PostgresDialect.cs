@@ -11,6 +11,11 @@ public class PostgresDialect : ISqlDialect
     /// </summary>
     public static readonly ISqlDialect Instance = new PostgresDialect();
 
+    static PostgresDialect()
+    {
+        Array.Sort(ReservedKeywords, StringComparer.OrdinalIgnoreCase);
+    }
+
     /// <summary>
     /// Gets a value indicating whether the server supports OFFSET FETCH.
     /// </summary>
@@ -289,10 +294,10 @@ public class PostgresDialect : ISqlDialect
     /// <inheritdoc />
     public virtual bool IsReservedKeyword(string s)
     {
-        return ReservedKeywords.Contains(s);
+        return SqlKeywordLookup.IsReserved(ReservedKeywords, s);
     }
 
-    internal static readonly HashSet<string> ReservedKeywords = new([
+    internal static readonly string[] ReservedKeywords = [
         "ABS",
         "ABSOLUTE",
         "ACCESS",
@@ -813,5 +818,5 @@ public class PostgresDialect : ISqlDialect
         "XMIN",
         "YEAR",
         "ZONE",
-    ], StringComparer.OrdinalIgnoreCase);
+    ];
 }

@@ -6,7 +6,7 @@ namespace Serenity.Data;
 /// <seealso cref="ISqlDialect" />
 public class OracleDialect : ISqlDialect
 {
-    private static readonly HashSet<string> keywords = new([
+    private static readonly string[] keywords = [
         "ACCESS", "ACCOUNT", "ACTIVATE", "ADD", "ADMIN", "ADVISE", "AFTER", "ALL", "ALL_ROWS", "ALLOCATE", "ALTER", "ANALYZE", "AND", "ANY", "ARCHIVE", "ARCHIVELOG", "ARRAY", "AS", "ASC", "AT", "AUDIT", "AUTHENTICATED", "AUTHORIZATION", "AUTOEXTEND", "AUTOMATIC",
         "BACKUP", "BECOME", "BEFORE", "BEGIN", "BETWEEN", "BFILE", "BITMAP", "BLOB", "BLOCK", "BODY", "BY",
         "CACHE", "CACHE_INSTANCES", "CANCEL", "CASCADE", "CAST", "CFILE", "CHAINED", "CHANGE", "CHAR", "CHAR_CS", "CHARACTER", "CHECK", "CHECKPOINT", "CHOOSE", "CHUNK", "CLEAR", "CLOB", "CLONE", "CLOSE", "CLOSE_CACHED_OPEN_CURSORS", "CLUSTER", "COALESCE", "COLUMN", "COLUMNS", "COMMENT", "COMMIT", "COMMITTED", "COMPATIBILITY", "COMPILE", "COMPLETE", "COMPOSITE_LIMIT", "COMPRESS",
@@ -22,12 +22,18 @@ public class OracleDialect : ISqlDialect
         "RESTRICTED", "RETURN", "RETURNING", "REUSE", "REVERSE", "REVOKE", "ROLE", "ROLES", "ROLLBACK", "ROW", "ROWID", "ROWNUM", "ROWS", "RULE", "SAMPLE", "SAVEPOINT", "SB4", "SCAN_INSTANCES", "SCHEMA", "SCN", "SCOPE", "SD_ALL", "SD_INHIBIT", "SD_SHOW", "SEGMENT", "SEG_BLOCK", "SEG_FILE", "SELECT", "SEQUENCE", "SERIALIZABLE", "SESSION", "SESSION_CACHED_CURSORS", "SESSIONS_PER_USER", "SET", "SHARE", "SHARED", "SHARED_POOL", "SHRINK", "SIZE", "SKIP",
         "SKIP_UNUSABLE_INDEXES", "SMALLINT", "SNAPSHOT", "SOME", "SORT", "SPECIFICATION", "SPLIT", "SQL_TRACE", "STANDBY", "START", "STATEMENT_ID", "STATISTICS", "STOP", "STORAGE", "STORE", "STRUCTURE", "SUCCESSFUL", "SWITCH", "SYS_OP_ENFORCE_NOT_NULL$", "SYS_OP_NTCIMG$", "SYNONYM", "SYSDATE", "SYSDBA", "SYSOPER", "SYSTEM", "TABLE", "TABLES", "TABLESPACE", "TABLESPACE_NO", "TABNO", "TEMPORARY", "THAN", "THE", "THEN", "THREAD", "TIMESTAMP", "TIME", "TO", "TOPLEVEL",
         "TRACE", "TRACING", "TRANSACTION", "TRANSITIONAL", "TRIGGER", "TRIGGERS", "TRUE", "TRUNCATE", "TX", "TYPE", "UB2", "UBA", "UID", "UNARCHIVED", "UNDO", "UNION", "UNIQUE", "UNLIMITED", "UNLOCK", "UNRECOVERABLE", "UNTIL", "UNUSABLE", "UNUSED", "UPDATABLE", "UPDATE", "USAGE", "USE", "USER", "USING", "VALIDATE", "VALIDATION", "VALUE", "VALUES", "VARCHAR", "VARCHAR2", "VARYING", "VIEW", "WHEN", "WHENEVER", "WHERE", "WITH", "WITHOUT", "WORK", "WRITE", "WRITEDOWN", "WRITEUP", "XID", "YEAR", "ZONE"
-    ], StringComparer.OrdinalIgnoreCase);
+    ];
 
     /// <summary>
     /// The shared instance of OracleDialect.
     /// </summary>
     public static readonly ISqlDialect Instance = new OracleDialect();
+
+    static OracleDialect()
+    {
+        Array.Sort(keywords, StringComparer.OrdinalIgnoreCase);
+        Array.Sort(ReservedKeywords, StringComparer.OrdinalIgnoreCase);
+    }
 
     /// <summary>
     /// Gets a value indicating whether the server supports OFFSET FETCH.
@@ -176,7 +182,7 @@ public class OracleDialect : ISqlDialect
         if (s.StartsWith("\"") && s.EndsWith("\""))
             return s;
 
-        if (keywords.Contains(s) || s.IndexOf(' ') >= 0)
+        if (SqlKeywordLookup.IsReserved(keywords, s) || s.IndexOf(' ') >= 0)
             return '"' + s.ToUpperInvariant() + '"';
 
         return s;
@@ -316,10 +322,10 @@ public class OracleDialect : ISqlDialect
     /// <inheritdoc />
     public virtual bool IsReservedKeyword(string s)
     {
-        return ReservedKeywords.Contains(s);
+        return SqlKeywordLookup.IsReserved(ReservedKeywords, s);
     }
 
-    internal static readonly HashSet<string> ReservedKeywords = new([
+    internal static readonly string[] ReservedKeywords = [
         "ACCESS",
         "ADD",
         "ALL",
@@ -448,5 +454,5 @@ public class OracleDialect : ISqlDialect
         "WHENEVER",
         "WHERE",
         "WITH",
-    ], StringComparer.OrdinalIgnoreCase);
+    ];
 }
