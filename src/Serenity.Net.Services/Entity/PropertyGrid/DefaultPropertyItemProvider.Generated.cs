@@ -1,5 +1,5 @@
 using System.Text.Json;
-using Serenity.Net.Services.Generators;
+using System.Reflection;
 
 namespace Serenity.PropertyGrid;
 
@@ -7,12 +7,14 @@ public partial class DefaultPropertyItemProvider
 {
     partial void LoadGeneratedMetadata(Type type, List<PropertyItem> list)
     {
-        if (string.IsNullOrEmpty(GeneratedMetadata.Json))
+        var metadataType = Type.GetType("Serenity.PropertyMetadata.GeneratedMetadata");
+        if (metadataType?.GetField("Json", BindingFlags.Public | BindingFlags.Static)?.GetValue(null) is not string json ||
+            string.IsNullOrEmpty(json))
             return;
 
         try
         {
-            var all = JsonSerializer.Deserialize<List<Dictionary<string, string>>>(GeneratedMetadata.Json);
+            var all = JsonSerializer.Deserialize<List<Dictionary<string, string>>>(json);
             if (all == null)
                 return;
 
