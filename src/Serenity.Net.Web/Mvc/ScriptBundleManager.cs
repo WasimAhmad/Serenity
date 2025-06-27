@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using System.Collections.Concurrent;
 
 namespace Serenity.Web;
 
@@ -17,6 +18,10 @@ public class ScriptBundleManager : IScriptBundleManager
     private Dictionary<string, HashSet<string>> bundleKeysBySourceUrl;
     private HashSet<string> bundleKeys;
     private Dictionary<string, List<string>> bundleIncludes;
+    private Dictionary<string, string[]> bundleDefinitions;
+
+    private static readonly ConcurrentBag<List<Func<string>>> listPool = new();
+    private static readonly ConcurrentBag<HashSet<string>> setPool = new();
 
     private const string errorLines = "\r\n//\r\n//!!!ERROR: {0}!!!\r\n//\r\n";
     private readonly IScriptMinifier scriptMinifier;
@@ -86,10 +91,10 @@ public class ScriptBundleManager : IScriptBundleManager
                     .Where(u => !string.IsNullOrEmpty(u))
                     .ToArray());
 
+            bundleDefinitions = bundles;
             bundleIncludes = BundleUtils.ExpandBundleIncludes(bundles, "dynamic://Bundle.", "script");
 
-            if (bundles.Count == 0 ||
-                settings.Enabled != true)
+            if (bundles.Count == 0 || settings.Enabled != true)
             {
                 bundleKeyBySourceUrl = null;
                 bundleKeysBySourceUrl = null;
@@ -101,22 +106,13 @@ public class ScriptBundleManager : IScriptBundleManager
             bundleKeysBySourceUrl = new Dictionary<string, HashSet<string>>(StringComparer.OrdinalIgnoreCase);
             bundleKeys = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
-            bool minimize = settings.Minimize == true;
-            var noMinimize = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-            if (settings.NoMinimize != null)
-                noMinimize.AddRange(settings.NoMinimize);
-
             foreach (var pair in bundles)
             {
                 var sourceFiles = pair.Value;
-                if (sourceFiles == null ||
-                    sourceFiles.Length == 0)
+                if (sourceFiles == null || sourceFiles.Length == 0)
                     continue;
 
                 var bundleKey = pair.Key;
-                var bundleName = "Bundle." + bundleKey;
-                var bundleParts = new List<Func<string>>();
-                var scriptNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
                 void registerInBundle(string sourceFile)
                 {
@@ -140,55 +136,6 @@ public class ScriptBundleManager : IScriptBundleManager
                     if (sourceFile.StartsWith("dynamic://", StringComparison.OrdinalIgnoreCase))
                     {
                         registerInBundle(sourceFile);
-
-                        var scriptName = sourceFile[10..];
-                        scriptNames.Add(scriptName);
-                        bundleParts.Add(() =>
-                        {
-                            if (recursionCheck != null)
-                            {
-                                if (recursionCheck.Contains(scriptName) || recursionCheck.Count > 100)
-                                    return string.Format(CultureInfo.CurrentCulture, errorLines,
-                                        string.Format(CultureInfo.CurrentCulture, "Caught infinite recursion with dynamic scripts '{0}'!",
-                                            string.Join(", ", recursionCheck)));
-                            }
-                            else
-                                recursionCheck = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-
-                            recursionCheck.Add(scriptName);
-                            try
-                            {
-                                var code = scriptManager.GetScriptText(scriptName);
-                                if (code == null)
-                                    return string.Format(CultureInfo.CurrentCulture, errorLines,
-                                        string.Format(CultureInfo.CurrentCulture, "Dynamic script with name '{0}' is not found!", scriptName));
-
-                                if (minimize &&
-                                    !scriptName.StartsWith("Bundle.", StringComparison.OrdinalIgnoreCase))
-                                {
-                                    try
-                                    {
-                                        var result = scriptMinifier.MinifyScript(code, new()
-                                        {
-                                            LineBreakThreshold = 1000
-                                        });
-                                        if (!result.HasErrors)
-                                            code = result.Code;
-                                    }
-                                    catch (Exception ex)
-                                    {
-                                        logger?.LogError(ex, "Error minifying script: {script}", scriptName);
-                                    }
-                                }
-
-                                return code;
-                            }
-                            finally
-                            {
-                                recursionCheck.Remove(scriptName);
-                            }
-                        });
-
                         continue;
                     }
 
@@ -200,84 +147,8 @@ public class ScriptBundleManager : IScriptBundleManager
                         continue;
 
                     registerInBundle(sourceUrl);
-
-                    bundleParts.Add(() =>
-                    {
-                        var sourcePath = sourceUrl[rootUrl.Length..];
-                        var sourceInfo = hostEnvironment.WebRootFileProvider.GetFileInfo(sourcePath);
-                        if (!sourceInfo.Exists)
-                            return string.Format(CultureInfo.CurrentCulture, errorLines, string.Format(CultureInfo.CurrentCulture, 
-                                "File {0} is not found!", sourcePath));
-
-                        if (minimize &&
-                            !noMinimize.Contains(sourceFile) &&
-                            !sourceFile.EndsWith(".min.js", StringComparison.OrdinalIgnoreCase))
-                        {
-                            if (settings.UseMinJS == true)
-                            {
-                                var minPath = System.IO.Path.ChangeExtension(sourcePath, ".min.js");
-                                var minInfo = hostEnvironment.WebRootFileProvider.GetFileInfo(minPath);
-                                if (minInfo.Exists)
-                                {
-                                    sourcePath = minPath;
-                                    using var sr = new System.IO.StreamReader(minInfo.CreateReadStream());
-                                    return sr.ReadToEnd();
-                                }
-                            }
-
-                            string code;
-                            using (var sr = new System.IO.StreamReader(sourceInfo.CreateReadStream()))
-                                code = sr.ReadToEnd();
-
-                            try
-                            {
-                                var result = scriptMinifier.MinifyScript(code, new()
-                                { 
-                                    LineBreakThreshold = 1000
-                                });
-                                if (result.HasErrors)
-                                    return code;
-                                return result.Code;
-                            }
-                            catch (Exception ex)
-                            {
-                                logger?.LogError(ex, "Error minifying script: {script}", sourceFile);
-                                return code;
-                            }
-                        }
-
-                        using (var sr = new System.IO.StreamReader(sourceInfo.CreateReadStream()))
-                            return sr.ReadToEnd();
-                    });
                 }
 
-                var bundle = new ConcatenatedScript(bundleParts, checkRights: (permissions, localizer) =>
-                {
-                    foreach (var scriptName in scriptNames)
-                    {
-                        if (recursionCheck != null)
-                        {
-                            if (recursionCheck.Contains(scriptName) || recursionCheck.Count > 100)
-                                throw new InvalidOperationException(string.Format(CultureInfo.CurrentCulture,
-                                    "Caught infinite recursion with dynamic scripts '{0}'!",
-                                        string.Join(", ", recursionCheck)));
-                        }
-                        else
-                            recursionCheck = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-
-                        recursionCheck.Add(scriptName);
-                        try
-                        {
-                            scriptManager.CheckScriptRights(scriptName);
-                        }
-                        finally
-                        {
-                            recursionCheck.Remove(scriptName);
-                        }
-                    }
-                });
-
-                scriptManager.Register(bundleName, bundle);
                 bundleKeys.Add(bundleKey);
             }
 
@@ -299,16 +170,26 @@ public class ScriptBundleManager : IScriptBundleManager
     public void ScriptsChanged()
     {
         BundleUtils.ClearVersionCache();
+        Reset();
+
+        HashSet<string> keys;
+        Dictionary<string, string[]> defs;
 
         lock (sync)
         {
-            if (bundleKeys == null)
-                return;
+            keys = bundleKeys;
+            defs = bundleDefinitions;
+        }
 
-            foreach (var bundleKey in bundleKeys)
-                scriptManager.Changed("Bundle." + bundleKey);
+        if (keys == null || defs == null)
+            return;
 
-            Reset();
+        foreach (var bundleKey in keys)
+        {
+            if (defs.TryGetValue(bundleKey, out var sourceFiles))
+                scriptManager.Register("Bundle." + bundleKey, BuildBundle(bundleKey, sourceFiles));
+
+            scriptManager.Changed("Bundle." + bundleKey);
         }
     }
 
@@ -355,7 +236,196 @@ public class ScriptBundleManager : IScriptBundleManager
                 return scriptUrl;
         }
 
+        EnsureBundleRegistered(bundleKey);
         string include = scriptManager.GetScriptInclude("Bundle." + bundleKey);
         return VirtualPathUtility.ToAbsolute(contextAccessor, "~/DynJS.axd/" + include);
+    }
+
+    private static List<Func<string>> RentList()
+    {
+        return listPool.TryTake(out var list) ? list : new List<Func<string>>();
+    }
+
+    private static void ReturnList(List<Func<string>> list)
+    {
+        list.Clear();
+        listPool.Add(list);
+    }
+
+    private static HashSet<string> RentSet()
+    {
+        return setPool.TryTake(out var set) ? set : new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+    }
+
+    private static void ReturnSet(HashSet<string> set)
+    {
+        set.Clear();
+        setPool.Add(set);
+    }
+
+    private ConcatenatedScript BuildBundle(string bundleKey, string[] sourceFiles)
+    {
+        var settings = options.Value;
+        bool minimize = settings.Minimize == true;
+        var noMinimize = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        if (settings.NoMinimize != null)
+            noMinimize.AddRange(settings.NoMinimize);
+
+        var bundleParts = RentList();
+        var scriptNames = RentSet();
+        var rootUrl = VirtualPathUtility.ToAbsolute(contextAccessor, "~/");
+
+        foreach (var sourceFile in sourceFiles)
+        {
+            if (string.IsNullOrEmpty(sourceFile))
+                continue;
+
+            if (sourceFile.StartsWith("dynamic://", StringComparison.OrdinalIgnoreCase))
+            {
+                var scriptName = sourceFile[10..];
+                scriptNames.Add(scriptName);
+                bundleParts.Add(() =>
+                {
+                    if (recursionCheck != null)
+                    {
+                        if (recursionCheck.Contains(scriptName) || recursionCheck.Count > 100)
+                            return string.Format(CultureInfo.CurrentCulture, errorLines,
+                                string.Format(CultureInfo.CurrentCulture, "Caught infinite recursion with dynamic scripts '{0}'!",
+                                    string.Join(", ", recursionCheck)));
+                    }
+                    else
+                        recursionCheck = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+                    recursionCheck.Add(scriptName);
+                    try
+                    {
+                        var code = scriptManager.GetScriptText(scriptName);
+                        if (code == null)
+                            return string.Format(CultureInfo.CurrentCulture, errorLines,
+                                string.Format(CultureInfo.CurrentCulture, "Dynamic script with name '{0}' is not found!", scriptName));
+
+                        if (minimize &&
+                            !scriptName.StartsWith("Bundle.", StringComparison.OrdinalIgnoreCase))
+                        {
+                            try
+                            {
+                                var result = scriptMinifier.MinifyScript(code, new() { LineBreakThreshold = 1000 });
+                                if (!result.HasErrors)
+                                    code = result.Code;
+                            }
+                            catch (Exception ex)
+                            {
+                                logger?.LogError(ex, "Error minifying script: {script}", scriptName);
+                            }
+                        }
+
+                        return code;
+                    }
+                    finally
+                    {
+                        recursionCheck.Remove(scriptName);
+                    }
+                });
+
+                continue;
+            }
+
+            string sourceUrl = BundleUtils.ExpandVersionVariable(hostEnvironment.WebRootFileProvider, sourceFile);
+            sourceUrl = VirtualPathUtility.ToAbsolute(contextAccessor, sourceUrl);
+
+            if (string.IsNullOrEmpty(sourceUrl) || !sourceUrl.StartsWith(rootUrl, StringComparison.Ordinal))
+                continue;
+
+            bundleParts.Add(() =>
+            {
+                var sourcePath = sourceUrl[rootUrl.Length..];
+                var sourceInfo = hostEnvironment.WebRootFileProvider.GetFileInfo(sourcePath);
+                if (!sourceInfo.Exists)
+                    return string.Format(CultureInfo.CurrentCulture, errorLines,
+                        string.Format(CultureInfo.CurrentCulture, "File {0} is not found!", sourcePath));
+
+                if (minimize && !noMinimize.Contains(sourceFile) && !sourceFile.EndsWith(".min.js", StringComparison.OrdinalIgnoreCase))
+                {
+                    if (settings.UseMinJS == true)
+                    {
+                        var minPath = System.IO.Path.ChangeExtension(sourcePath, ".min.js");
+                        var minInfo = hostEnvironment.WebRootFileProvider.GetFileInfo(minPath);
+                        if (minInfo.Exists)
+                        {
+                            sourcePath = minPath;
+                            using var sr = new System.IO.StreamReader(minInfo.CreateReadStream());
+                            return sr.ReadToEnd();
+                        }
+                    }
+
+                    string code;
+                    using (var sr = new System.IO.StreamReader(sourceInfo.CreateReadStream()))
+                        code = sr.ReadToEnd();
+
+                    try
+                    {
+                        var result = scriptMinifier.MinifyScript(code, new() { LineBreakThreshold = 1000 });
+                        if (result.HasErrors)
+                            return code;
+                        return result.Code;
+                    }
+                    catch (Exception ex)
+                    {
+                        logger?.LogError(ex, "Error minifying script: {script}", sourceFile);
+                        return code;
+                    }
+                }
+
+                using (var sr = new System.IO.StreamReader(sourceInfo.CreateReadStream()))
+                    return sr.ReadToEnd();
+            });
+        }
+
+        var partArray = bundleParts.ToArray();
+        ReturnList(bundleParts);
+        var scriptNameArray = scriptNames.ToArray();
+        ReturnSet(scriptNames);
+
+        var bundle = new ConcatenatedScript(partArray, checkRights: (permissions, localizer) =>
+        {
+            foreach (var sn in scriptNameArray)
+            {
+                if (recursionCheck != null)
+                {
+                    if (recursionCheck.Contains(sn) || recursionCheck.Count > 100)
+                        throw new InvalidOperationException(string.Format(CultureInfo.CurrentCulture,
+                            "Caught infinite recursion with dynamic scripts '{0}'!",
+                                string.Join(", ", recursionCheck)));
+                }
+                else
+                    recursionCheck = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+                recursionCheck.Add(sn);
+                try
+                {
+                    scriptManager.CheckScriptRights(sn);
+                }
+                finally
+                {
+                    recursionCheck.Remove(sn);
+                }
+            }
+        });
+
+        return bundle;
+    }
+
+    private void EnsureBundleRegistered(string bundleKey)
+    {
+        lock (sync)
+        {
+            if (scriptManager.IsRegistered("Bundle." + bundleKey))
+                return;
+
+            if (bundleDefinitions == null || !bundleDefinitions.TryGetValue(bundleKey, out var sources))
+                return;
+
+            scriptManager.Register("Bundle." + bundleKey, BuildBundle(bundleKey, sources));
+        }
     }
 }
