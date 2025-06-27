@@ -72,6 +72,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Serene.Web", "serene\src\Se
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Serene.Tests", "serene\tests\Serene.Tests\Serene.Tests.csproj", "{24C790C0-0494-4B88-A8A9-17AB7BC294B2}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{DA4DC271-6FC0-419D-9AFF-050F7147AF41}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Serenity.PropertyMetadataGenerator", "src\Serenity.PropertyMetadataGenerator\Serenity.PropertyMetadataGenerator.csproj", "{F3D05376-2D39-4123-9681-11A727E2041C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -149,6 +153,10 @@ Global
 		{24C790C0-0494-4B88-A8A9-17AB7BC294B2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{24C790C0-0494-4B88-A8A9-17AB7BC294B2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{24C790C0-0494-4B88-A8A9-17AB7BC294B2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F3D05376-2D39-4123-9681-11A727E2041C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F3D05376-2D39-4123-9681-11A727E2041C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F3D05376-2D39-4123-9681-11A727E2041C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F3D05376-2D39-4123-9681-11A727E2041C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -173,6 +181,7 @@ Global
 		{0C1D7761-93AB-4361-AD7C-DF200B97B62B} = {4F13A746-0751-4EA0-BE46-A9A85886828F}
 		{9C4591C7-9BC1-497C-BB6F-FB74D739D5E9} = {4F13A746-0751-4EA0-BE46-A9A85886828F}
 		{EE167232-372C-4036-AF27-AA3C586EC020} = {4F13A746-0751-4EA0-BE46-A9A85886828F}
+		{F3D05376-2D39-4123-9681-11A727E2041C} = {DA4DC271-6FC0-419D-9AFF-050F7147AF41}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {E2545865-7A32-47F4-A186-EDEBDCEF9EEF}

@@ -1,0 +1,10 @@
+<Project>
+  <ItemGroup>
+    <Using Remove="Serenity" />
+    <Using Remove="Serenity.Abstractions" />
+    <Using Remove="Serenity.ComponentModel" />
+    <Using Remove="Serenity.Data" />
+    <Using Remove="Serenity.Data.Mapping" />
+    <Using Remove="Serenity.Services" />
+  </ItemGroup>
+</Project>
