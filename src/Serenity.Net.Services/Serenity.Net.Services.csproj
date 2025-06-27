@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <AssemblyName>Serenity.Net.Services</AssemblyName>
     <TargetFramework>net8.0</TargetFramework>
@@ -7,9 +7,9 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Serenity.Net.Core\Serenity.Net.Core.csproj" />
+    <ProjectReference Include="..\Serenity.Net.Services.Generators\Serenity.Net.Services.Generators.csproj" />
     <PackageReference Include="Dapper" Version="2.1.66" />
     <PackageReference Include="Microsoft.Extensions.FileProviders.Abstractions" Version="9.0.2" />
     <PackageReference Include="SixLabors.ImageSharp" Version="2.1.10" />
-    <ProjectReference Include="..\Serenity.Net.Services.Generators\Serenity.Net.Services.Generators.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
   </ItemGroup>
 </Project>

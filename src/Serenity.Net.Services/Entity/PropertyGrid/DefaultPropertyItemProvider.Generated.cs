@@ -1,5 +1,5 @@
 using System.Text.Json;
-using Serenity.PropertyMetadata;
+using Serenity.Net.Services.Generators;
 
 namespace Serenity.PropertyGrid;
 
