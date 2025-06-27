@@ -127,4 +127,5 @@ public partial class DefaultPropertyItemProvider(IServiceProvider provider, ITyp
     }
 
     partial void LoadGeneratedMetadata(Type type, List<PropertyItem> list);
+
 }

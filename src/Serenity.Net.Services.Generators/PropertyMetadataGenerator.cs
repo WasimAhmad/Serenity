@@ -8,29 +8,26 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
 using System.Text.Json;
 
-namespace Serenity.PropertyMetadataGenerator;
+namespace Serenity.Net.Services.Generators;
 
 [Generator]
 public class PropertyMetadataGenerator : ISourceGenerator
 {
     public void Initialize(GeneratorInitializationContext context)
     {
-        // No initialization required
+        // no init required
     }
 
     public void Execute(GeneratorExecutionContext context)
     {
-        var syntaxTrees = context.Compilation.SyntaxTrees;
         var propertyData = new List<Dictionary<string, object>>();
-
-        foreach (var tree in syntaxTrees)
+        foreach (var tree in context.Compilation.SyntaxTrees)
         {
             var semanticModel = context.Compilation.GetSemanticModel(tree);
             var classes = tree.GetRoot().DescendantNodes().OfType<ClassDeclarationSyntax>();
             foreach (var cls in classes)
             {
-                var symbol = semanticModel.GetDeclaredSymbol(cls) as INamedTypeSymbol;
-                if (symbol == null)
+                if (semanticModel.GetDeclaredSymbol(cls) is not INamedTypeSymbol symbol)
                     continue;
 
                 bool hasAttribute = symbol.GetAttributes().Any(a => a.AttributeClass?.Name.EndsWith("FormScriptAttribute") == true ||
