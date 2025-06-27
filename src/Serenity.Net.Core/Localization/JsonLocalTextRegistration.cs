@@ -89,10 +89,21 @@ public static class JsonLocalTextRegistration
             if (langID is null)
                 continue;
 
-            var texts = JSON.Parse<Dictionary<string, object>>(
-                fileSystem.ReadAllText(file).TrimToNull() ?? "{}") ?? [];
-
-            AddFromNestedDictionary(texts, "", langID, registry);
+            if (registry is LocalTextRegistry ltr)
+            {
+                var filePath = file;
+                ltr.RegisterJsonLoader(langID, () =>
+                {
+                    var jsonText = fileSystem.ReadAllText(filePath).TrimToNull();
+                    return jsonText is null ? null : JSON.Parse<Dictionary<string, object>>(jsonText);
+                });
+            }
+            else
+            {
+                var texts = JSON.Parse<Dictionary<string, object>>(
+                    fileSystem.ReadAllText(file).TrimToNull() ?? "{}") ?? [];
+                AddFromNestedDictionary(texts, "", langID, registry);
+            }
         }
     }
 

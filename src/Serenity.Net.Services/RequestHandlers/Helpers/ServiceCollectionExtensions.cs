@@ -322,14 +322,32 @@ public static class ServiceCollectionExtensions
             if (langID is null)
                 continue;
 
-            using var stream = entry.CreateReadStream();
-            using var sr = new StreamReader(stream);
-            string json = sr.ReadToEnd().TrimToNull();
-            if (json is null)
-                continue;
-            var texts = JSON.Parse<Dictionary<string, object>>(json);
+            if (registry is LocalTextRegistry ltr)
+            {
+                var providerCopy = provider;
+                var filePath = Path.Combine(subpath, entry.Name);
+                ltr.RegisterJsonLoader(langID, () =>
+                {
+                    var fi = providerCopy.GetFileInfo(filePath);
+                    if (!fi.Exists)
+                        return null;
+                    using var stream = fi.CreateReadStream();
+                    using var sr = new StreamReader(stream);
+                    var json = sr.ReadToEnd().TrimToNull();
+                    return json is null ? null : JSON.Parse<Dictionary<string, object>>(json);
+                });
+            }
+            else
+            {
+                using var stream = entry.CreateReadStream();
+                using var sr = new StreamReader(stream);
+                string json = sr.ReadToEnd().TrimToNull();
+                if (json is null)
+                    continue;
+                var texts = JSON.Parse<Dictionary<string, object>>(json);
 
-            JsonLocalTextRegistration.AddFromNestedDictionary(texts, "", langID, registry);
+                JsonLocalTextRegistration.AddFromNestedDictionary(texts, "", langID, registry);
+            }
         }
 
         return registry;
