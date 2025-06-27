@@ -19,6 +19,8 @@ public class LocalTextRegistry : ILocalTextRegistry, IRemoveAll, IGetAllTexts, I
 
     private readonly ConcurrentDictionary<string, string> languageFallbacks = new(StringComparer.OrdinalIgnoreCase);
 
+    private readonly ConcurrentDictionary<string, List<Func<Dictionary<string, object>?>>> lazyJsonTexts = new(StringComparer.OrdinalIgnoreCase);
+
     /// <summary>
     /// Adds a local text entry to the registry
     /// </summary>
@@ -62,6 +64,45 @@ public class LocalTextRegistry : ILocalTextRegistry, IRemoveAll, IGetAllTexts, I
         pendingTexts[new LanguageIdKeyPair(languageID, key)] = text;
     }
 
+    private void EnsureJsonTextsLoaded(string languageID)
+    {
+        if (!lazyJsonTexts.TryGetValue(languageID, out var loaders))
+            return;
+
+        lock (loaders)
+        {
+            if (loaders.Count == 0)
+                return;
+
+            foreach (var loader in loaders.ToArray())
+            {
+                var texts = loader();
+                if (texts is not null)
+                    JsonLocalTextRegistration.AddFromNestedDictionary(texts, "", languageID, this);
+            }
+
+            loaders.Clear();
+        }
+    }
+
+    /// <summary>
+    /// Registers a lazy JSON loader for a language.
+    /// </summary>
+    /// <param name="languageID">Language ID to register for.</param>
+    /// <param name="loader">Loader delegate returning the JSON dictionary.</param>
+    public void RegisterJsonLoader(string languageID, Func<Dictionary<string, object>?> loader)
+    {
+        if (languageID == null)
+            throw new ArgumentNullException(nameof(languageID));
+
+        if (loader == null)
+            throw new ArgumentNullException(nameof(loader));
+
+        var list = lazyJsonTexts.GetOrAdd(languageID, static _ => []);
+        lock (list)
+            list.Add(loader);
+    }
+
     /// <summary>
     /// Converts the local text key to its representation in requested language. Looks up text
     /// in requested language, its Fallbacks and invariant language in order. If not found in any,
@@ -77,7 +118,8 @@ public class LocalTextRegistry : ILocalTextRegistry, IRemoveAll, IGetAllTexts, I
 
         if (textKey == null)
             throw new ArgumentNullException(nameof(textKey));
-        
+        EnsureJsonTextsLoaded(languageID);
+
         var circularCheck = 0;
         LanguageIdKeyPair k;
         do
@@ -96,6 +138,7 @@ public class LocalTextRegistry : ILocalTextRegistry, IRemoveAll, IGetAllTexts, I
                 return null;
 
             languageID = TryGetLanguageFallback(languageID) ?? LocalText.InvariantLanguageID;
+            EnsureJsonTextsLoaded(languageID);
         }
         while (circularCheck++ < 10);
 
@@ -229,5 +272,6 @@ public class LocalTextRegistry : ILocalTextRegistry, IRemoveAll, IGetAllTexts, I
         approvedTexts.Clear();
         pendingTexts.Clear();
         languageFallbacks.Clear();
+        lazyJsonTexts.Clear();
     }
 }
