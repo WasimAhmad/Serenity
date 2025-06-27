@@ -11,6 +11,11 @@ public class MySqlDialect : ISqlDialect
     /// </summary>
     public static readonly ISqlDialect Instance = new MySqlDialect();
 
+    static MySqlDialect()
+    {
+        Array.Sort(ReservedKeywords, StringComparer.OrdinalIgnoreCase);
+    }
+
     /// <summary>
     /// Gets a value indicating whether the server supports OFFSET FETCH.
     /// </summary>
@@ -285,10 +290,10 @@ public class MySqlDialect : ISqlDialect
     /// <inheritdoc />
     public virtual bool IsReservedKeyword(string s)
     {
-        return ReservedKeywords.Contains(s);
+        return SqlKeywordLookup.IsReserved(ReservedKeywords, s);
     }
 
-    internal static readonly HashSet<string> ReservedKeywords = new([
+    internal static readonly string[] ReservedKeywords = [
         "ACCESSIBLE",
         "ADD",
         "ALL",
@@ -559,5 +564,5 @@ public class MySqlDialect : ISqlDialect
         "XOR",
         "YEAR_MONTH",
         "ZEROFILL",
-    ], StringComparer.OrdinalIgnoreCase);
+    ];
 }

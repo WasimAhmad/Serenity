@@ -11,6 +11,11 @@ public class SqliteDialect : ISqlDialect
     /// </summary>
     public static ISqlDialect Instance = new SqliteDialect();
 
+    static SqliteDialect()
+    {
+        Array.Sort(ReservedKeywords, StringComparer.OrdinalIgnoreCase);
+    }
+
     /// <inheritdoc/>
     public virtual bool CanUseConcat => false;
 
@@ -289,10 +294,10 @@ public class SqliteDialect : ISqlDialect
     /// <inheritdoc />
     public virtual bool IsReservedKeyword(string s)
     {
-        return ReservedKeywords.Contains(s);
+        return SqlKeywordLookup.IsReserved(ReservedKeywords, s);
     }
 
-    internal static readonly HashSet<string> ReservedKeywords = new([
+    internal static readonly string[] ReservedKeywords = [
         "ABORT",
         "ACTION",
         "ADD",
@@ -440,5 +445,5 @@ public class SqliteDialect : ISqlDialect
         "WINDOW",
         "WITH",
         "WITHOUT",
-    ], StringComparer.OrdinalIgnoreCase);
+    ];
 }

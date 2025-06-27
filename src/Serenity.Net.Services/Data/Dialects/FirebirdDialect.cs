@@ -11,8 +11,13 @@ public class FirebirdDialect : ISqlDialect
     /// </summary>
     public static readonly FirebirdDialect Instance = new();
 
-    private static readonly HashSet<string> keywords = new(StringComparer.OrdinalIgnoreCase)
+    static FirebirdDialect()
     {
+        Array.Sort(keywords, StringComparer.OrdinalIgnoreCase);
+        Array.Sort(ReservedKeywords, StringComparer.OrdinalIgnoreCase);
+    }
+
+    private static readonly string[] keywords = [
         "!<", "^<", "^=", "^>", ",", ":=", "!=", "!>", "(", ")", "<", "<=", "<>", "=", ">", ">=", "||", "~<", "~=", "~>",
         "ABS", "ACCENT", "ACOS", "ACTION", "ACTIVE", "ADD", "ADMIN", "AFTER", "ALL", "ALTER", "ALWAYS", "AND", "ANY",
         "AS", "ASC", "ASCENDING", "ASCII_CHAR", "ASCII_VAL", "ASIN", "AT", "ATAN", "ATAN2", "AUTO", "AUTONOMOUS", "AVG",
@@ -43,7 +48,7 @@ public class FirebirdDialect : ISqlDialect
         "TRUNC", "TWO_PHASE", "TYPE", "UNCOMMITTED", "UNDO", "UNION", "UNIQUE", "UPDATE", "UPDATING", "UPPER", "USER", "USING", "UUID_TO_CHAR",
         "VALUE", "VALUES", "VARCHAR", "VARIABLE", "VARYING", "VIEW", "WAIT", "WEEK", "WEEKDAY", "WHEN", "WHERE", "WHILE", "WITH", "WORK",
         "WRITE", "YEAR", "YEARDAY"
-    };
+    ];
 
     /// <inheritdoc/>
     public virtual bool CanUseConcat => false;
@@ -189,7 +194,7 @@ public class FirebirdDialect : ISqlDialect
         if (s.StartsWith("\"") && s.EndsWith("\""))
             return s;
 
-        if (keywords.Contains(s) || s.IndexOf(' ') >= 0 || s.StartsWith("_"))
+        if (SqlKeywordLookup.IsReserved(keywords, s) || s.IndexOf(' ') >= 0 || s.StartsWith("_"))
             return '"' + s + '"';
 
         return s;
@@ -326,10 +331,10 @@ public class FirebirdDialect : ISqlDialect
     /// <inheritdoc />
     public virtual bool IsReservedKeyword(string s)
     {
-        return ReservedKeywords.Contains(s);
+        return SqlKeywordLookup.IsReserved(ReservedKeywords, s);
     }
 
-    internal static readonly HashSet<string> ReservedKeywords = new([
+    internal static readonly string[] ReservedKeywords = [
         "ADD",
         "ADMIN",
         "ALL",
@@ -527,5 +532,5 @@ public class FirebirdDialect : ISqlDialect
         "WHILE",
         "WITH",
         "YEAR",
-    ], StringComparer.OrdinalIgnoreCase);
+    ];
 }

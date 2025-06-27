@@ -11,6 +11,11 @@ public class SqlServer2000Dialect : ISqlDialect
     /// </summary>
     public static readonly ISqlDialect Instance = new SqlServer2000Dialect();
 
+    static SqlServer2000Dialect()
+    {
+        Array.Sort(ReservedKeywords, StringComparer.OrdinalIgnoreCase);
+    }
+
     /// <inheritdoc/>
     public virtual bool CanUseConcat => false;
 
@@ -296,7 +301,7 @@ public class SqlServer2000Dialect : ISqlDialect
     /// </value>
     public virtual char ParameterPrefix => '@';
 
-    internal static readonly HashSet<string> ReservedKeywords = new([
+    internal static readonly string[] ReservedKeywords = [
         "ADD",
         "ALL",
         "ALTER",
@@ -482,11 +487,11 @@ public class SqlServer2000Dialect : ISqlDialect
         "WITH",
         "WITHIN GROUP",
         "WRITETEXT"
-    ], StringComparer.OrdinalIgnoreCase);
+    ];
 
     /// <inheritdoc />
     public bool IsReservedKeyword(string keyword)
     {
-        return ReservedKeywords.Contains(keyword);
+        return SqlKeywordLookup.IsReserved(ReservedKeywords, keyword);
     }
 }

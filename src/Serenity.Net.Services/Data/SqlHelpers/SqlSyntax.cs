@@ -74,15 +74,19 @@ public static class SqlSyntax
             return "T" + joinIndex.ToString(_invariant) + ".";
     }
 
-    private static readonly HashSet<string> ReservedKeywordForAny =
-        new([
-            ..FirebirdDialect.ReservedKeywords,
-            ..MySqlDialect.ReservedKeywords,
-            ..OracleDialect.ReservedKeywords,
-            ..PostgresDialect.ReservedKeywords,
-            ..SqliteDialect.ReservedKeywords,
-            ..SqlServer2000Dialect.ReservedKeywords
-        ], StringComparer.OrdinalIgnoreCase);
+    private static readonly string[] ReservedKeywordForAny;
+
+    static SqlSyntax()
+    {
+        var set = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        set.UnionWith(FirebirdDialect.ReservedKeywords);
+        set.UnionWith(MySqlDialect.ReservedKeywords);
+        set.UnionWith(OracleDialect.ReservedKeywords);
+        set.UnionWith(PostgresDialect.ReservedKeywords);
+        set.UnionWith(SqliteDialect.ReservedKeywords);
+        set.UnionWith(SqlServer2000Dialect.ReservedKeywords);
+        ReservedKeywordForAny = set.OrderBy(x => x, StringComparer.OrdinalIgnoreCase).ToArray();
+    }
 
     /// <summary>
     /// Returns true if the specified identifier is a SQL keyword in any of the
@@ -94,7 +98,7 @@ public static class SqlSyntax
         if (string.IsNullOrEmpty(identifier))
             return false;
 
-        return ReservedKeywordForAny.Contains(identifier);
+        return SqlKeywordLookup.IsReserved(ReservedKeywordForAny, identifier);
     }
 
     /// <summary>
