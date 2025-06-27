@@ -50,10 +50,7 @@ public class PropertyMetadataGenerator : ISourceGenerator
             }
         }
 
-        if (propertyData.Count == 0)
-            return;
-
-        var json = JsonSerializer.Serialize(propertyData);
+        var json = propertyData.Count == 0 ? "" : JsonSerializer.Serialize(propertyData);
         var source = $@"namespace Serenity.PropertyMetadata; internal static class GeneratedMetadata {{ public const string Json = @""{json}""; }}";
         context.AddSource("PropertyMetadata.g.cs", SourceText.From(source, Encoding.UTF8));
     }
