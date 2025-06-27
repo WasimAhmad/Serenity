@@ -67,6 +67,7 @@ public static class JsonLocalTextRegistration
     /// <param name="registry">Registry</param>
     /// <param name="path">Path containing JSON files</param>
     /// <param name="fileSystem">File system</param>
+    [Obsolete("This method eagerly loads texts. Use IServiceCollection.ConfigureJsonTextRoot and lazy loading via ILanguageTextLoader instead.")]
     public static void AddJsonTexts(this ILocalTextRegistry registry, string path, IFileSystem? fileSystem = null)
     {
         if (registry is null)

@@ -19,13 +19,14 @@ public static class RecaptchaValidation
     /// <param name="secretKey">Secret key</param>
     /// <param name="token">Token</param>
     /// <param name="localizer">Text localizer</param>
+    /// <param name="httpClientFactory">HTTP client factory</param>
     /// <remarks>Inspired from https://github.com/tanveery/recaptcha-net/blob/master/src/Recaptcha.Web/RecaptchaVerificationHelper.cs</remarks>
-    public static void Validate(string secretKey, string token, ITextLocalizer localizer)
+    public static void Validate(string secretKey, string token, ITextLocalizer localizer, IHttpClientFactory httpClientFactory)
     {
-        ValidateAsync(secretKey, token, localizer).GetAwaiter().GetResult();
+        ValidateAsync(secretKey, token, localizer, httpClientFactory).GetAwaiter().GetResult();
     }
 
-    public static async Task ValidateAsync(string secretKey, string token, ITextLocalizer localizer)
+    public static async Task ValidateAsync(string secretKey, string token, ITextLocalizer localizer, IHttpClientFactory httpClientFactory)
     {
         if (string.IsNullOrEmpty(token))
             throw new ValidationError("Recaptcha", localizer.Get("Validation.Recaptcha"));
@@ -37,7 +38,7 @@ public static class RecaptchaValidation
         };
 
         var content = new FormUrlEncodedContent(values);
-        using var httpClient = new HttpClient();
+        var httpClient = httpClientFactory.CreateClient(nameof(RecaptchaValidation));
         using var response = await httpClient.PostAsync("https://www.google.com/recaptcha/api/siteverify", content);
         var responseJson = await response.Content.ReadAsStringAsync();
 

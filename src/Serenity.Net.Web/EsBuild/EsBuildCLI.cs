@@ -1,10 +1,20 @@
 using System.Diagnostics;
 
+using System.Net.Http;
+
 namespace Serenity.Web.EsBuild;
 
-internal class EsBuildCLI(string path = null)
+internal class EsBuildCLI
 {
-    private readonly string path = path ?? new EsBuildDownloader().Download();
+    private readonly string path;
+    private readonly IHttpClientFactory httpClientFactory;
+
+    public EsBuildCLI(IHttpClientFactory httpClientFactory, string path = null)
+    {
+        this.httpClientFactory = httpClientFactory ?? throw new ArgumentNullException(nameof(httpClientFactory));
+        this.path = path ?? new EsBuildDownloader(httpClient: this.httpClientFactory.CreateClient(nameof(EsBuildDownloader)))
+            .Download();
+    }
 
     private string Run(string arguments, string stdin)
     {

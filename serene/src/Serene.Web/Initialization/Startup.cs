@@ -123,14 +123,29 @@ public partial class Startup
         services.AddTransient<Workflow.RejectDocumentWorkflowHandler>();
         services.AddTransient<Workflow.ApprovalPermissionGuard>();
         services.AddSingleton<IWorkflowDefinitionProvider, WorkflowDefinitionProvider>();
+
+        ConfigureJsonTextRoots(services, HostEnvironment);
+    }
+
+    public static void ConfigureJsonTextRoots(IServiceCollection services, IWebHostEnvironment env)
+    {
+        // Configure paths for JsonLanguageTextLoader
+        services.ConfigureJsonTextRoot(env.WebRootFileProvider, "Scripts/site/texts");
+        services.ConfigureJsonTextRoot(env.ContentRootFileProvider, "App_Data/texts");
     }
 
     public static void InitializeLocalTexts(IServiceProvider services)
     {
+        // This method is called after DI container is built.
+        // AddBaseTexts loads texts from attributes, enums etc.
+        // and now also configures JsonLocalTextAssetsAttribute paths for the loader.
         var env = services.GetRequiredService<IWebHostEnvironment>();
-        services.AddBaseTexts(env.WebRootFileProvider)
-            .AddJsonTexts(env.WebRootFileProvider, "Scripts/site/texts")
-            .AddJsonTexts(env.ContentRootFileProvider, "App_Data/texts");
+        services.AddBaseTexts(env.WebRootFileProvider);
+
+        // Optionally, eagerly load a default language after setup if desired, e.g.
+        // var textRegistry = services.GetRequiredService<ILocalTextRegistry>();
+        // if (textRegistry is LocalTextRegistry registry)
+        //     registry.EnsureLanguageLoaded(LocalText.InvariantLanguageID); // or "en"
     }
 
     // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -147,6 +162,9 @@ public partial class Startup
             }
         }
 
+        // InitializeLocalTexts now primarily handles non-JSON texts and asset attributes.
+        // JSON text roots are configured in ConfigureServices.
+        // Eager loading of a default language's JSON texts could happen here if needed.
         InitializeLocalTexts(app.ApplicationServices);
 
         app.UseRequestLocalization();

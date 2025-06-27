@@ -38,9 +38,9 @@ public static class TwoLevelCacheExtensions
     /// <returns>Random 64 bit number</returns>
     private static ulong RandomGeneration()
     {
-        var buffer = new byte[sizeof(ulong)];
+        Span<byte> buffer = stackalloc byte[sizeof(ulong)];
         GenerationRandomizer.NextBytes(buffer);
-        var value = BitConverter.ToUInt64(buffer, 0);
+        var value = BitConverter.ToUInt64(buffer);
 
         if (value == 0)
             return ulong.MaxValue;

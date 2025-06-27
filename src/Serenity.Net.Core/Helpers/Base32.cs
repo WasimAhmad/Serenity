@@ -40,10 +40,22 @@ public sealed class Base32
     ///   An encoded string that holds the contents of the inputs</returns>
     public static string Encode(byte[] bytes)
     {
-        if (bytes == null)
-            throw new ArgumentNullException("bytes");
+        ArgumentNullException.ThrowIfNull(bytes);
+        return Encode(bytes.AsSpan());
+    }
 
+    /// <summary>
+    ///   Encode a buffer using the default options</summary>
+    /// <param name="bytes">
+    ///   The buffer (required).</param>
+    /// <returns>
+    ///   An encoded string that holds the contents of the inputs</returns>
+    public static string Encode(ReadOnlySpan<byte> bytes)
+    {
         int len = bytes.Length;
+        if (len == 0)
+            return string.Empty;
+
         StringBuilder base32 = new((len * 8 + 4) / 5);
 
         int currByte, digit, i = 0;

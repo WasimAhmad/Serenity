@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
@@ -11,37 +10,31 @@ namespace Serenity.Services;
 /// A JSON service client implementation
 /// </summary>
 /// <remarks>
-/// Creates an instance of JsonServiceClient for the passed baseUrl
+/// Creates an instance of JsonServiceClient with a given HttpClient and base URL.
 /// </remarks>
-/// <param name="baseUrl">The base url</param>
+/// <param name="httpClient">The HttpClient to use for requests. This client should be obtained from IHttpClientFactory and correctly configured.</param>
+/// <param name="baseUrl">The base URL for resolving relative paths. Note that HttpClient.BaseAddress might also be set but this is used for UriHelper.Combine.</param>
 public class JsonServiceClient
 {
-    /// <summary>
-    /// Cookie container
-    /// </summary>
-    protected readonly CookieContainer cookies = new();
-
     private readonly HttpClient httpClient;
 
-    public JsonServiceClient(string baseUrl)
+    /// <summary>
+    /// Initializes a new instance of the <see cref="JsonServiceClient"/> class.
+    /// </summary>
+    /// <param name="httpClient">The HTTP client, ideally from IHttpClientFactory.</param>
+    /// <param name="baseUrl">The base URL.</param>
+    /// <exception cref="ArgumentNullException">httpClient is null</exception>
+    public JsonServiceClient(HttpClient httpClient, string baseUrl)
     {
-        BaseUrl = baseUrl;
-
-        var handler = new HttpClientHandler
-        {
-            CookieContainer = cookies
-        };
-
-        httpClient = new HttpClient(handler)
-        {
-            Timeout = TimeSpan.FromMinutes(10)
-        };
+        this.httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
+        BaseUrl = baseUrl ?? throw new ArgumentNullException(nameof(baseUrl));
+        // The Timeout should be configured on the HttpClient instance by the factory or creator
     }
 
     /// <summary>
-    /// Base url for the client
+    /// Base url for the client, used with UriHelper.Combine
     /// </summary>
-    protected string BaseUrl { get; set; }
+    protected string BaseUrl { get; }
 
     /// <summary>
     /// Post to JSON service

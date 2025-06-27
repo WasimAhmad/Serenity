@@ -1,21 +1,31 @@
 using Microsoft.Extensions.Logging;
 using System.IO;
+using System.Net.Http;
 
 namespace Serenity.Web.EsBuild;
 
-internal class EsBuildMinifier(ILogger<EsBuildMinifier> logger = null) : ICssMinifier, IScriptMinifier
+internal class EsBuildMinifier : ICssMinifier, IScriptMinifier
 {
     private EsBuildCLI cli;
+    private readonly IHttpClientFactory httpClientFactory;
+    private readonly ILogger<EsBuildMinifier> logger;
+
+    public EsBuildMinifier(IHttpClientFactory httpClientFactory, ILogger<EsBuildMinifier> logger = null)
+    {
+        this.httpClientFactory = httpClientFactory ?? throw new ArgumentNullException(nameof(httpClientFactory));
+        this.logger = logger;
+    }
 
     private EsBuildCLI GetCLI()
     {
         if (cli != null)
             return cli;
 
-        var downloader = new EsBuildDownloader();
+        var httpClient = httpClientFactory.CreateClient(nameof(EsBuildDownloader));
+        var downloader = new EsBuildDownloader(httpClient: httpClient);
         var targetDirectory = Path.Combine(Path.GetTempPath(), ".esbuild");
         var executablePath = downloader.Download(targetDirectory: targetDirectory);
-        return (cli = new EsBuildCLI(executablePath));
+        return (cli = new EsBuildCLI(httpClientFactory, executablePath));
     }
 
     public CssMinifyResult MinifyCss(string source, CssMinifyOptions options)

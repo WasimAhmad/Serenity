@@ -250,8 +250,10 @@ public class TemporaryFileHelper
     public static string RandomFileCode()
     {
         Guid guid = Guid.NewGuid();
-        var guidBytes = guid.ToByteArray();
-        var eightBytes = new byte[8];
+        Span<byte> guidBytes = stackalloc byte[16];
+        guid.TryWriteBytes(guidBytes);
+
+        Span<byte> eightBytes = stackalloc byte[8];
         for (int i = 0; i < 8; i++)
             eightBytes[i] = (byte)(guidBytes[i] ^ guidBytes[i + 8]);
         return Base32.Encode(eightBytes);

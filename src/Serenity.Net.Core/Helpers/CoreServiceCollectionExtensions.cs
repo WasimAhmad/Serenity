@@ -36,7 +36,16 @@ public static class CoreServiceCollectionExtensions
         if (services is null)
             throw new ArgumentNullException(nameof(services));
 
+        // Options for JsonLanguageTextLoader
+        services.TryAddSingleton<JsonLanguageTextLoaderOptions>();
+
+        // The loader itself
+        services.TryAddSingleton<ILanguageTextLoader, JsonLanguageTextLoader>();
+
+        // The main registry (now depends on IServiceProvider to get ILanguageTextLoader)
         services.TryAddSingleton<ILocalTextRegistry, LocalTextRegistry>();
+
+        // Default localizer (depends on ILocalTextRegistry)
         services.TryAddSingleton<ITextLocalizer, DefaultTextLocalizer>();
     }
 
