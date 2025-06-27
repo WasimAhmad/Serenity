@@ -37,6 +37,8 @@ public partial class DefaultPropertyItemProvider(IServiceProvider provider, ITyp
 
         var list = new List<PropertyItem>();
 
+        LoadGeneratedMetadata(type, list);
+
         var basedOnRow = GetBasedOnRow(type, out bool checkNames);
         var processors = processorFactories.Select(x => (IPropertyProcessor)x(provider, []))
             .OrderBy(x => x.Priority).ToList();
@@ -123,4 +125,7 @@ public partial class DefaultPropertyItemProvider(IServiceProvider provider, ITyp
         checkPropertyNames = basedOnRowAttr.CheckNames;
         return (IRow)Activator.CreateInstance(basedOnRowType);
     }
+
+    partial void LoadGeneratedMetadata(Type type, List<PropertyItem> list);
+
 }
